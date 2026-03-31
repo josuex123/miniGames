@@ -1,0 +1,6 @@
+tiene que ganar el que en menos tiempo lo haga
+puede que sea online
+puede que necesite nombres
+para un ranking
+base de datos fija para esto
+local para que otras personas no puedan ingresar mas palabras
