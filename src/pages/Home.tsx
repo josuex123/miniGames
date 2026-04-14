@@ -25,6 +25,7 @@ export default function Home() {
     { id: 3, title: 'Carreras', path: '/game_cars', imageUrl: carsGame },
     { id: 4, title: 'Dinosaurio', path: '/game_dyno', imageUrl: dynoGame },
     { id: 5, title: 'Tetris', path: '/game_tetris', imageUrl: tetrisGame },
+    { id: 6, title: 'Juego de letras', path: '/game_letras', imageUrl: setGame },
   ];
 
   return (

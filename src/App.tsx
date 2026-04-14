@@ -5,6 +5,7 @@ import GameHangMan from './pages/Games/GameHangMan'
 import GameTetris from './pages/Games/GameTetris'
 import GameDyno from './pages/Games/GameDyno'
 import GameCars from './pages/Games/GameCars'
+import GameLetras from './pages/Games/GameLetras'
 
 function App() {
   return (
@@ -16,6 +17,7 @@ function App() {
       <Route path="/game_cars" element={<GameCars/>}/>
       <Route path="/game_dyno" element={<GameDyno/>}/>
       <Route path="/game_tetris" element={<GameTetris/>}/>
+      <Route path="/game_letras" element={<GameLetras/>}/>
     </Routes>
   )
 }
