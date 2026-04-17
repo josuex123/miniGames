@@ -38,6 +38,7 @@ export default function GameDyno() {
   const [isGameOver, setIsGameOver] = useState(false);
   const [isGameStarted, setIsGameStarted] = useState(false);
 
+  // Refs mecánicos
   const dinoY = useRef(GROUND_Y);
   const velocityY = useRef(0);
   const obstacles = useRef<Obstacle[]>([]);
@@ -46,6 +47,7 @@ export default function GameDyno() {
   const frameId = useRef<number>(0);
   const lastObstacleSpawn = useRef(100);
 
+  // Estado visual
   const [visualDinoY, setVisualDinoY] = useState(0);
   const [visualObstacles, setVisualObstacles] = useState<Obstacle[]>([]);
   const [isJumping, setIsJumping] = useState(false);
@@ -112,7 +114,7 @@ export default function GameDyno() {
       }
 
       const speed = Math.min(BASE_SPEED + scoreRef.current * SPEED_INCREMENT, MAX_SPEED);
-      setCurrentSpeed(speed);
+      setCurrentSpeed(speed); // SE USA AQUÍ
 
       obstacles.current = obstacles.current.map((obs) => ({
         ...obs,
@@ -199,12 +201,8 @@ export default function GameDyno() {
           50% { transform: scale(1.05) rotate(3deg); }
           100% { transform: scale(1); }
         }
-        .wolf-walk {
-          animation: wolf-walk 0.4s ease-in-out infinite;
-        }
-        .wolf-jump {
-          animation: wolf-jump-fx 0.3s ease-out;
-        }
+        .wolf-walk { animation: wolf-walk 0.4s ease-in-out infinite; }
+        .wolf-jump { animation: wolf-jump-fx 0.3s ease-out; }
       `}</style>
 
       {isGameOver && (
@@ -229,23 +227,33 @@ export default function GameDyno() {
             <div className="text-5xl font-black text-[#871F80] flex items-baseline gap-2">
               {score} <span className="text-sm text-slate-400 uppercase font-bold tracking-widest">Points</span>
             </div>
+            <div className="text-xs text-slate-400">Record: <span className="text-[#871F80] font-bold">{highScore}</span></div>
           </div>
+
           <div className="flex justify-center">
             <img src={logoAlpha2} alt="Alpha Gaming" className="w-[70vw] sm:w-[32vw] h-auto object-contain" />
           </div>
+
           <div className="flex flex-col items-end gap-2">
             <Link to="/" className="text-slate-400 font-bold hover:text-[#871F80] transition-colors uppercase tracking-widest text-xs">
               ← VOLVER AL MENÚ
             </Link>
+            {/* ESTA LÍNEA USA LA VARIABLE Y EVITA EL ERROR DE TS */}
+            <div className="text-xs text-slate-400">
+              Velocidad: <span className="text-[#871F80] font-bold">{currentSpeed.toFixed(1)}x</span>
+            </div>
           </div>
         </header>
 
         <section className="flex-1 flex flex-col items-center justify-center gap-8">
           <div className="w-full max-w-5xl h-64 bg-white rounded-[2rem] shadow-inner border-2 border-slate-200 relative overflow-hidden select-none">
             
+            {/* Nubes originales */}
             <div className="absolute top-10 w-12 h-4 bg-slate-100 rounded-full" style={{ right: `${10 + (score % 20)}%` }} />
             <div className="absolute top-20 w-16 h-5 bg-slate-100 rounded-full" style={{ left: `${15 + (score % 15)}%` }} />
+            <div className="absolute top-6 w-10 h-3 bg-slate-100 rounded-full" style={{ left: `${50 + (score % 25)}%` }} />
 
+            {/* Suelo */}
             <div className="absolute bottom-6 w-full h-[2px] bg-slate-200" />
 
             {!isGameStarted && (
@@ -257,7 +265,7 @@ export default function GameDyno() {
               </div>
             )}
 
-            {/* PERSONAJE: EL LOBO */}
+            {/* LOBO: Alineado con bottom-6 */}
             <div
               style={{ transform: `translateY(${visualDinoY}px)` }}
               className="absolute bottom-6 left-24 w-20 h-32 z-20"
@@ -271,7 +279,7 @@ export default function GameDyno() {
               />
             </div>
 
-            {/* OBSTÁCULOS */}
+            {/* Obstáculos originales alineados con bottom-6 */}
             {visualObstacles.map((obs) => (
               <div
                 key={obs.id}
@@ -300,14 +308,12 @@ export default function GameDyno() {
             ))}
           </div>
 
-          {isGameStarted && !isGameOver && (
-            <button
-              onMouseDown={jump}
-              className="bg-[#871F80] text-white px-20 py-6 rounded-2xl font-black text-2xl shadow-xl transition-all"
-            >
-              SALTAR!
-            </button>
-          )}
+          <button
+            onMouseDown={jump}
+            className="bg-[#871F80] text-white px-20 py-6 rounded-2xl font-black text-2xl shadow-xl transition-all uppercase italic"
+          >
+            SALTAR!
+          </button>
         </section>
       </div>
     </main>
