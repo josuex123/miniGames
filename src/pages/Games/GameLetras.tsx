@@ -10,9 +10,9 @@ interface FallingItem {
   x: number;
   y: number;
   speed: number;
+  isHit?: boolean; // Propiedad para saber si fue acertada
 }
 
-// Opciones de dificultad
 const SPEEDS = {
   LENTO: 0.1,
   NORMAL: 0.2,
@@ -28,10 +28,10 @@ export default function GameLetras() {
   const [score, setScore] = useState(0);
   const [lives, setLives] = useState(10);
   const [gameActive, setGameActive] = useState(false);
+  const [isPaused, setIsPaused] = useState(false);
   const [highScore, setHighScore] = useState(0);
-  
-  // Nuevo estado para la velocidad seleccionada
   const [selectedSpeed, setSelectedSpeed] = useState<number>(SPEEDS.NORMAL);
+  const [feedback, setFeedback] = useState(""); // Estado para el mensaje de "¡Muy bien!"
 
   const gameLoopRef = useRef<number | undefined>(undefined);
   const lastSpawnRef = useRef<number>(0);
@@ -45,16 +45,16 @@ export default function GameLetras() {
       char: chars.charAt(Math.floor(Math.random() * chars.length)),
       x: Math.floor(Math.random() * 85), 
       y: -10,
-      speed: selectedSpeed, // Velocidad fija seleccionada
+      speed: selectedSpeed,
+      isHit: false
     };
     setItems(prev => [...prev, newItem]);
   }, [selectedSpeed]);
 
   useEffect(() => {
-    if (!gameActive) return;
+    if (!gameActive || isPaused) return;
 
     const update = (time: number) => {
-      // Spawn constante
       if (time - lastSpawnRef.current > SPAWN_RATE) {
         spawnItem();
         lastSpawnRef.current = time;
@@ -65,8 +65,13 @@ export default function GameLetras() {
         let livesLost = 0;
 
         for (const item of prev) {
+          // Si el ítem ya fue golpeado (isHit), no se mueve, espera a ser borrado
+          if (item.isHit) {
+            newItems.push(item);
+            continue;
+          }
+
           const nextY = item.y + item.speed; 
-          
           if (nextY > 100) {
             livesLost++; 
           } else {
@@ -85,22 +90,41 @@ export default function GameLetras() {
     return () => {
       if (gameLoopRef.current) cancelAnimationFrame(gameLoopRef.current);
     };
-  }, [gameActive, spawnItem]);
+  }, [gameActive, isPaused, spawnItem]);
 
   useEffect(() => {
+    const messages = ["¡MUY BIEN!", "¡OK!", "¡GENIAL!", "¡EXCELENTE!", "¡BUENA!"];
+
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (!gameActive) return;
+      if (!gameActive || isPaused) return; 
       const key = e.key.toUpperCase();
 
       setItems(prev => {
         const targetIndex = prev.findIndex(item => 
-          item.char === key && item.y >= HIT_ZONE_MIN && item.y <= HIT_ZONE_MAX
+          item.char === key && 
+          item.y >= HIT_ZONE_MIN && 
+          item.y <= HIT_ZONE_MAX &&
+          !item.isHit
         );
 
         if (targetIndex !== -1) {
+          // 1. Mostrar feedback de texto
+          const randomMsg = messages[Math.floor(Math.random() * messages.length)];
+          setFeedback(randomMsg);
+          setTimeout(() => setFeedback(""), 800); // Borrar mensaje después de 800ms
+
           setScore(s => s + 10);
+
+          // 2. Marcar como acertado (para cambiar color y detener movimiento)
           const newItems = [...prev];
-          newItems.splice(targetIndex, 1);
+          const hitItem = { ...newItems[targetIndex], isHit: true };
+          newItems[targetIndex] = hitItem;
+
+          // 3. Eliminar del array después de un breve delay para que se vea el verde
+          setTimeout(() => {
+            setItems(current => current.filter(i => i.id !== hitItem.id));
+          }, 150);
+
           return newItems;
         }
         return prev;
@@ -109,8 +133,9 @@ export default function GameLetras() {
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [gameActive]);
+  }, [gameActive, isPaused]);
 
+  // Fin del juego
   useEffect(() => {
     if (lives <= 0 && gameActive) {
       setGameActive(false);
@@ -123,6 +148,16 @@ export default function GameLetras() {
     setLives(10);
     setItems([]);
     setGameActive(true);
+    setIsPaused(false);
+    setFeedback("");
+  };
+
+  const resetToMenu = () => {
+    setGameActive(false);
+    setIsPaused(false);
+    setItems([]);
+    setScore(0);
+    setFeedback("");
   };
 
   return (
@@ -134,7 +169,9 @@ export default function GameLetras() {
           <div className="relative p-10 lg:p-16 rounded-[3rem] shadow-2xl text-center max-w-2xl w-full border-4 animate-in zoom-in duration-300 bg-red-500 border-red-300 shadow-red-500/50">
             <h2 className="text-4xl lg:text-7xl font-black text-white uppercase mb-4 tracking-tighter">¡FIN DEL JUEGO!</h2>
             <p className="text-white/90 text-xl lg:text-2xl font-bold mb-8 uppercase">Puntaje final: {score} ✨</p>
-            <button onClick={startGame} className="bg-white text-slate-900 px-10 py-4 rounded-2xl font-black text-xl hover:scale-105 active:scale-95 transition-transform shadow-lg">REINTENTAR</button>
+            <button onClick={resetToMenu} className="bg-white text-slate-900 px-10 py-4 rounded-2xl font-black text-xl hover:scale-105 active:scale-95 transition-transform shadow-lg">
+              VOLVER A SELECCIÓN
+            </button>
           </div>
         </div>
       )}
@@ -166,40 +203,68 @@ export default function GameLetras() {
             </div>
 
             <div className="bg-[#871F80] rounded-[2.5rem] p-8 text-white shadow-2xl">
-              <h3 className="text-xs font-black text-white/60 mb-4 uppercase tracking-[0.3em]">Instrucciones</h3>
-              <p className="font-bold text-sm leading-relaxed mb-6">
-                Selecciona una dificultad y presiona las teclas en la zona purpúrea.
-              </p>
-
-              {/* SELECTOR DE VELOCIDAD */}
-              {!gameActive && (
-                <div className="space-y-3 mb-6">
-                  {(Object.keys(SPEEDS) as Array<keyof typeof SPEEDS>).map((level) => (
-                    <button
-                      key={level}
-                      onClick={() => setSelectedSpeed(SPEEDS[level])}
-                      className={`w-full py-3 rounded-xl font-black text-sm transition-all border-2 ${
-                        selectedSpeed === SPEEDS[level] 
-                        ? 'bg-white text-[#871F80] border-white scale-105 shadow-lg' 
-                        : 'bg-transparent text-white border-white/30 hover:bg-white/10'
-                      }`}
-                    >
-                      {level}
-                    </button>
-                  ))}
+              <h3 className="text-xs font-black text-white/60 mb-4 uppercase tracking-[0.3em]">Controles</h3>
+              
+              {!gameActive ? (
+                <>
+                  <p className="font-bold text-sm leading-relaxed mb-6">Elige la velocidad antes de iniciar:</p>
+                  <div className="space-y-3 mb-6">
+                    {(Object.keys(SPEEDS) as Array<keyof typeof SPEEDS>).map((level) => (
+                      <button
+                        key={level}
+                        onClick={() => setSelectedSpeed(SPEEDS[level])}
+                        className={`w-full py-3 rounded-xl font-black text-sm transition-all border-2 ${
+                          selectedSpeed === SPEEDS[level] 
+                          ? 'bg-white text-[#871F80] border-white scale-105 shadow-lg' 
+                          : 'bg-transparent text-white border-white/30 hover:bg-white/10'
+                        }`}
+                      >
+                        {level}
+                      </button>
+                    ))}
+                  </div>
+                  <button onClick={startGame} className="w-full bg-emerald-500 text-white py-4 rounded-xl font-black hover:bg-emerald-400 transition-all shadow-lg">
+                    ¡EMPEZAR JUEGO!
+                  </button>
+                </>
+              ) : (
+                <div className="space-y-4">
+                  <button 
+                    onClick={() => setIsPaused(!isPaused)} 
+                    className={`w-full py-4 rounded-xl font-black transition-all shadow-lg ${isPaused ? 'bg-emerald-500' : 'bg-yellow-500'}`}
+                  >
+                    {isPaused ? 'REANUDAR' : 'PAUSAR JUEGO'}
+                  </button>
+                  <button 
+                    onClick={resetToMenu} 
+                    className="w-full bg-red-500 text-white py-4 rounded-xl font-black hover:bg-red-600 transition-all shadow-lg"
+                  >
+                    DETENER / SALIR
+                  </button>
                 </div>
-              )}
-
-              {!gameActive && (
-                <button onClick={startGame} className="w-full bg-emerald-500 text-white py-4 rounded-xl font-black hover:bg-emerald-400 transition-all shadow-lg active:scale-95">
-                  ¡EMPEZAR AHORA!
-                </button>
               )}
             </div>
           </aside>
 
           <section className="lg:col-span-9 relative">
             <div className="bg-slate-900 rounded-[3.5rem] shadow-2xl border-[12px] border-white h-[650px] relative overflow-hidden">
+              
+              {/* Overlay de Feedback de Texto */}
+              {feedback && (
+                <div className="absolute top-10 left-0 right-0 z-[60] flex justify-center pointer-events-none animate-bounce">
+                  <span className="text-5xl font-black text-emerald-400 drop-shadow-[0_0_15px_rgba(52,211,153,0.7)] uppercase tracking-tighter">
+                    {feedback}
+                  </span>
+                </div>
+              )}
+
+              {/* Overlay de Pausa Visual */}
+              {isPaused && (
+                <div className="absolute inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center">
+                  <div className="text-white text-6xl font-black tracking-tighter animate-pulse">JUEGO EN PAUSA</div>
+                </div>
+              )}
+
               <div className="absolute inset-0 grid grid-cols-6 opacity-5 pointer-events-none">
                 {[...Array(6)].map((_, i) => <div key={i} className="border-r border-white h-full" />)}
               </div>
@@ -211,9 +276,12 @@ export default function GameLetras() {
               {items.map(item => (
                 <div
                   key={item.id}
-                  style={{ left: `${item.x}%`, top: `${item.y}%`, transition: 'none' }}
-                  className={`absolute w-16 h-16 flex items-center justify-center rounded-2xl font-black text-3xl shadow-xl border-b-4
-                    ${item.y > HIT_ZONE_MIN ? 'bg-emerald-500 border-emerald-700 text-white animate-pulse' : 'bg-white border-slate-300 text-slate-800'}`}
+                  style={{ left: `${item.x}%`, top: `${item.y}%`, transition: 'top 0.05s linear' }}
+                  className={`absolute w-16 h-16 flex items-center justify-center rounded-2xl font-black text-3xl shadow-xl border-b-4 transition-all
+                    ${item.isHit 
+                      ? 'bg-emerald-500 border-emerald-700 text-white scale-125 z-10' // Color verde al acertar
+                      : 'bg-white border-slate-300 text-slate-800' // Color normal
+                    }`}
                 >
                   {item.char}
                 </div>
@@ -223,7 +291,7 @@ export default function GameLetras() {
                 <div className="absolute inset-0 flex flex-col items-center justify-center text-center p-10 bg-slate-900/60 backdrop-blur-sm">
                    <div className="bg-white p-8 rounded-[2.5rem] shadow-2xl">
                      <p className="text-[#871F80] font-black text-3xl mb-2 uppercase">Configura tu nivel</p>
-                     <p className="text-slate-400 font-bold">Elige una velocidad en el menú lateral</p>
+                     <p className="text-slate-400 font-bold">Elige la velocidad para comenzar</p>
                    </div>
                 </div>
               )}

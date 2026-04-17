@@ -6,7 +6,7 @@ import logoCronex2 from '../../assets/LogoCronex2.svg';
 // --- CONFIGURACIÓN ---
 const ROAD_WIDTH = 350;
 const CAR_WIDTH = 60;
-const CAR_HEIGHT = 112;
+const CAR_HEIGHT = 100; // Ajustado para el mouse
 const ENEMY_SPEED_BASE = 4;
 const SPAWN_INTERVAL_BASE = 90;
 const MAX_ENEMIES = 3;
@@ -95,7 +95,7 @@ export default function GameCars() {
           const playerBottom = 600 - 48;
           const playerLeft = carXRef.current - CAR_WIDTH / 2;
           const playerRight = carXRef.current + CAR_WIDTH / 2;
-          const margin = 12;
+          const margin = 10;
 
           if (
             enemy.y + CAR_HEIGHT > playerTop + margin && 
@@ -126,8 +126,9 @@ export default function GameCars() {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [gameStarted, isGameOver]);
 
-  const handleAction = () => {
+const handleAction = () => {
     if (isGameOver) {
+      // Resetear todos los valores a su estado inicial
       setCarX(0);
       setEnemies([]);
       setIsGameOver(false);
@@ -135,7 +136,7 @@ export default function GameCars() {
       setScore(0);
       scoreRef.current = 0;
       setSpeed(0);
-      setGameStarted(true);
+      setGameStarted(false); 
     } else {
       setGameStarted(!gameStarted);
     }
@@ -144,14 +145,14 @@ export default function GameCars() {
   return (
     <main className="min-h-screen bg-[#F8FAFC] flex flex-col font-sans text-slate-900 relative antialiased overflow-hidden">
       
-      {/* MODAL SOLO PARA GAME OVER */}
       {isGameOver && (
         <div className="fixed inset-0 z-[120] flex items-center justify-center p-6 bg-slate-900/60 backdrop-blur-md">
           <div className="bg-white p-12 rounded-[3.5rem] shadow-2xl text-center border-4 border-[#871F80]">
-            <h2 className="text-6xl font-black text-slate-900 mb-2 italic">¡CRASH!</h2>
+            <h2 className="text-6xl font-black text-slate-900 mb-2 italic">¡SYSTEM FAILURE!</h2>
             <p className="text-xl font-bold text-slate-400 mb-8 uppercase tracking-widest">Score Final: {score}</p>
+            
             <button onClick={handleAction} className="bg-[#871F80] text-white px-10 py-4 rounded-2xl font-black text-xl hover:scale-105 active:scale-95 transition-transform shadow-lg">
-              REINTENTAR
+              REPARAR MOUSE
             </button>
           </div>
         </div>
@@ -162,7 +163,7 @@ export default function GameCars() {
         <div className="flex flex-col items-start gap-2">
           <img src={logoCronex2} alt="Cronex" className="h-auto w-[320px] object-contain" />
           <div className="text-6xl font-black text-[#871F80]">
-            {speed} <span className="text-2xl text-slate-400 uppercase tracking-tighter">Km/h</span>
+            {speed} <span className="text-2xl text-slate-400 uppercase tracking-tighter">DPI</span>
           </div>
         </div>
         <div className="flex justify-center items-center">
@@ -177,48 +178,58 @@ export default function GameCars() {
       <div className="flex-1 flex justify-center items-start gap-8 px-6">
         <div className="bg-white p-6 rounded-[3.5rem] shadow-2xl border border-slate-100 flex gap-8">
           
-          {/* CARRETERA */}
+          {/* CARRETERA (MOUSEPAD) */}
           <div className="w-[350px] h-[600px] bg-slate-800 rounded-3xl border-8 border-slate-700 relative shadow-inner overflow-hidden">
-            <div className={`absolute left-1/2 -translate-x-1/2 w-2 h-[200%] border-l-4 border-dashed border-white/30 ${gameStarted && !isGameOver ? 'animate-road' : ''}`} />
+            <div className={`absolute left-1/2 -translate-x-1/2 w-2 h-[200%] border-l-4 border-dashed border-white/10 ${gameStarted && !isGameOver ? 'animate-road' : ''}`} />
 
-            {/* JUGADOR */}
+            {/* JUGADOR: MOUSE GAMER */}
             <div
               style={{ transform: `translateX(${carX}px)` }}
-              className="absolute bottom-12 left-1/2 -translate-x-1/2 w-16 h-28 bg-[#871F80] rounded-xl shadow-2xl border-b-8 border-black/40 transition-transform duration-75 ease-out z-20"
+              className="absolute bottom-12 left-1/2 -translate-x-1/2 w-16 h-24 bg-slate-100 rounded-[2rem_2rem_2.5rem_2.5rem] shadow-[0_10px_0_rgba(0,0,0,0.3)] border-b-[6px] border-slate-300 transition-transform duration-75 ease-out z-20 flex flex-col items-center"
             >
-              <div className="w-full h-8 bg-slate-900/40 mt-3 rounded-sm" />
-              <div className="absolute -top-1 left-2 w-3 h-2 bg-yellow-100 rounded-full blur-[2px]" />
-              <div className="absolute -top-1 right-2 w-3 h-2 bg-yellow-100 rounded-full blur-[2px]" />
+              {/* Botones principales */}
+              <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[2px] h-10 bg-slate-300" />
+              {/* Scroll Wheel */}
+              <div className="w-3 h-7 bg-slate-800 rounded-full mt-4 shadow-inner border-t-2 border-slate-600" />
+              {/* Logo Alpha (Simulado) */}
+              <div className="mt-auto mb-4 w-5 h-5 rounded-full bg-[#871F80]/20 flex items-center justify-center animate-pulse">
+                <div className="w-2 h-2 rounded-full bg-[#871F80]" />
+              </div>
+              {/* Brillo lateral */}
+              <div className="absolute top-4 left-2 w-2 h-10 bg-white/60 rounded-full blur-[1px]" />
             </div>
 
-            {/* ENEMIGOS */}
+            {/* ENEMIGOS: TECLADOS MECÁNICOS */}
             {enemies.map((enemy) => (
               <div
                 key={enemy.id}
                 style={{ transform: `translate(calc(-50% + ${enemy.x}px), ${enemy.y}px)` }}
-                className="absolute left-1/2 w-16 h-28 bg-slate-400 rounded-xl shadow-lg border-b-8 border-slate-600"
+                className="absolute left-1/2 w-20 h-24 bg-slate-900 rounded-lg shadow-lg border-b-8 border-black flex flex-wrap p-2 gap-1 justify-center content-center"
               >
-                <div className="w-full h-8 bg-slate-900/20 mt-3 rounded-sm" />
+                {/* Simulando teclas del teclado enemigo */}
+                {[...Array(9)].map((_, i) => (
+                  <div key={i} className="w-4 h-4 bg-slate-700 rounded-sm border-b-2 border-slate-800" />
+                ))}
+                <div className="w-full h-1 bg-[#871F80]/40 rounded-full mt-1" /> {/* Luz RGB enemiga */}
               </div>
             ))}
           </div>
 
-          {/* PANEL LATERAL (AQUÍ ESTÁ EL BOTÓN) */}
+          {/* PANEL LATERAL */}
           <aside className="w-48 flex flex-col gap-6">
             <div className="bg-[#871F80] rounded-[2.5rem] p-6 text-white shadow-lg text-center">
-              <h3 className="text-[10px] font-black text-white/60 uppercase tracking-[0.2em] mb-2">PUNTOS</h3>
+              <h3 className="text-[10px] font-black text-white/60 uppercase tracking-[0.2em] mb-2">SCORE</h3>
               <p className="text-4xl font-black">{score}</p>
             </div>
 
             <div className="bg-slate-50 rounded-[2.5rem] p-6 border border-slate-100">
               <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-4 text-center">CONTROLES</h3>
               <div className="space-y-2 text-[10px] font-bold text-slate-400 text-center uppercase">
-                <p>← → : MOVER</p>
-                <p>RÁPIDO Y PRECISO</p>
+                <p>FLECHAS : DESLIZAR</p>
+                <p>EVITA LOS TECLADOS</p>
               </div>
             </div>
 
-            {/* BOTÓN AL LADO DEL JUEGO */}
             <button
               onClick={handleAction}
               className={`w-full py-6 rounded-2xl font-black transition-all shadow-md active:scale-95 text-xl ${
@@ -227,7 +238,7 @@ export default function GameCars() {
                 : 'bg-[#871F80] text-white hover:bg-[#6b1860] shadow-[0_8px_0_rgb(90,20,85)] translate-y-[-4px]'
               }`}
             >
-              {gameStarted ? "PAUSAR" : "COMENZAR"}
+              {gameStarted ? "PAUSAR" : "CONECTAR"}
             </button>
           </aside>
         </div>
@@ -244,7 +255,7 @@ export default function GameCars() {
           0% { transform: translate(-50%, -50%); }
           100% { transform: translate(-50%, 0%); }
         }
-        .animate-road { animation: road-move 0.4s linear infinite; }
+        .animate-road { animation: road-move 0.6s linear infinite; }
       `}</style>
     </main>
   );
