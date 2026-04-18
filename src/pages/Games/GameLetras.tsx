@@ -10,7 +10,7 @@ interface FallingItem {
   x: number;
   y: number;
   speed: number;
-  isHit?: boolean; // Propiedad para saber si fue acertada
+  isHit?: boolean;
 }
 
 const SPEEDS = {
@@ -31,13 +31,12 @@ export default function GameLetras() {
   const [isPaused, setIsPaused] = useState(false);
   const [highScore, setHighScore] = useState(0);
   const [selectedSpeed, setSelectedSpeed] = useState<number>(SPEEDS.NORMAL);
-  const [feedback, setFeedback] = useState(""); // Estado para el mensaje de "¡Muy bien!"
+  const [feedback, setFeedback] = useState("");
 
   const gameLoopRef = useRef<number | undefined>(undefined);
   const lastSpawnRef = useRef<number>(0);
 
-  // --- LÓGICA DE JUEGO ---
-
+  // --- LÓGICA DE JUEGO (Se mantiene igual) ---
   const spawnItem = useCallback(() => {
     const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
     const newItem: FallingItem = {
@@ -53,89 +52,55 @@ export default function GameLetras() {
 
   useEffect(() => {
     if (!gameActive || isPaused) return;
-
     const update = (time: number) => {
       if (time - lastSpawnRef.current > SPAWN_RATE) {
         spawnItem();
         lastSpawnRef.current = time;
       }
-
       setItems(prev => {
         const newItems: FallingItem[] = [];
         let livesLost = 0;
-
         for (const item of prev) {
-          // Si el ítem ya fue golpeado (isHit), no se mueve, espera a ser borrado
-          if (item.isHit) {
-            newItems.push(item);
-            continue;
-          }
-
+          if (item.isHit) { newItems.push(item); continue; }
           const nextY = item.y + item.speed; 
-          if (nextY > 100) {
-            livesLost++; 
-          } else {
-            newItems.push({ ...item, y: nextY });
-          }
+          if (nextY > 100) { livesLost++; } 
+          else { newItems.push({ ...item, y: nextY }); }
         }
-
         if (livesLost > 0) setLives(l => Math.max(0, l - livesLost));
         return newItems;
       });
-
       gameLoopRef.current = requestAnimationFrame(update);
     };
-
     gameLoopRef.current = requestAnimationFrame(update);
-    return () => {
-      if (gameLoopRef.current) cancelAnimationFrame(gameLoopRef.current);
-    };
+    return () => { if (gameLoopRef.current) cancelAnimationFrame(gameLoopRef.current); };
   }, [gameActive, isPaused, spawnItem]);
 
   useEffect(() => {
     const messages = ["¡MUY BIEN!", "¡OK!", "¡GENIAL!", "¡EXCELENTE!", "¡BUENA!"];
-
     const handleKeyDown = (e: KeyboardEvent) => {
       if (!gameActive || isPaused) return; 
       const key = e.key.toUpperCase();
-
       setItems(prev => {
         const targetIndex = prev.findIndex(item => 
-          item.char === key && 
-          item.y >= HIT_ZONE_MIN && 
-          item.y <= HIT_ZONE_MAX &&
-          !item.isHit
+          item.char === key && item.y >= HIT_ZONE_MIN && item.y <= HIT_ZONE_MAX && !item.isHit
         );
-
         if (targetIndex !== -1) {
-          // 1. Mostrar feedback de texto
-          const randomMsg = messages[Math.floor(Math.random() * messages.length)];
-          setFeedback(randomMsg);
-          setTimeout(() => setFeedback(""), 800); // Borrar mensaje después de 800ms
-
+          setFeedback(messages[Math.floor(Math.random() * messages.length)]);
+          setTimeout(() => setFeedback(""), 800);
           setScore(s => s + 10);
-
-          // 2. Marcar como acertado (para cambiar color y detener movimiento)
           const newItems = [...prev];
           const hitItem = { ...newItems[targetIndex], isHit: true };
           newItems[targetIndex] = hitItem;
-
-          // 3. Eliminar del array después de un breve delay para que se vea el verde
-          setTimeout(() => {
-            setItems(current => current.filter(i => i.id !== hitItem.id));
-          }, 150);
-
+          setTimeout(() => { setItems(current => current.filter(i => i.id !== hitItem.id)); }, 150);
           return newItems;
         }
         return prev;
       });
     };
-
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [gameActive, isPaused]);
 
-  // Fin del juego
   useEffect(() => {
     if (lives <= 0 && gameActive) {
       setGameActive(false);
@@ -143,77 +108,64 @@ export default function GameLetras() {
     }
   }, [lives, gameActive, score, highScore]);
 
-  const startGame = () => {
-    setScore(0);
-    setLives(10);
-    setItems([]);
-    setGameActive(true);
-    setIsPaused(false);
-    setFeedback("");
-  };
-
-  const resetToMenu = () => {
-    setGameActive(false);
-    setIsPaused(false);
-    setItems([]);
-    setScore(0);
-    setFeedback("");
-  };
+  const startGame = () => { setScore(0); setLives(10); setItems([]); setGameActive(true); setIsPaused(false); setFeedback(""); };
+  const resetToMenu = () => { setGameActive(false); setIsPaused(false); setItems([]); setScore(0); setFeedback(""); };
 
   return (
     <main className="min-h-screen bg-[#F8FAFC] flex flex-col font-sans text-slate-900 relative antialiased overflow-hidden">
       
-      {/* MODAL GAME OVER */}
+      {/* MODAL GAME OVER ESCALABLE */}
       {lives <= 0 && !gameActive && score > 0 && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-slate-900/40 backdrop-blur-md">
-          <div className="relative p-10 lg:p-16 rounded-[3rem] shadow-2xl text-center max-w-2xl w-full border-4 animate-in zoom-in duration-300 bg-red-500 border-red-300 shadow-red-500/50">
-            <h2 className="text-4xl lg:text-7xl font-black text-white uppercase mb-4 tracking-tighter">¡FIN DEL JUEGO!</h2>
-            <p className="text-white/90 text-xl lg:text-2xl font-bold mb-8 uppercase">Puntaje final: {score} ✨</p>
-            <button onClick={resetToMenu} className="bg-white text-slate-900 px-10 py-4 rounded-2xl font-black text-xl hover:scale-105 active:scale-95 transition-transform shadow-lg">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-[2vw] bg-slate-900/40 backdrop-blur-md">
+          <div className="relative p-[5vw] rounded-[4vw] shadow-2xl text-center max-w-[50vw] w-full border-[0.4vw] bg-red-500 border-red-300 shadow-red-500/50">
+            <h2 className="text-[5vw] font-black text-white uppercase mb-[1vw] tracking-tighter leading-none">¡FIN DEL JUEGO!</h2>
+            <p className="text-white/90 text-[2vw] font-bold mb-[3vw] uppercase">Puntaje final: {score} ✨</p>
+            <button onClick={resetToMenu} className="bg-white text-slate-900 px-[4vw] py-[1.5vw] rounded-[1.5vw] font-black text-[1.5vw] hover:scale-105 active:scale-95 transition-transform shadow-lg">
               VOLVER A SELECCIÓN
             </button>
           </div>
         </div>
       )}
 
-      {/* Header */}
-      <div className="flex-1 w-full px-6 sm:px-12 lg:px-20 py-10 flex flex-col gap-8">
-        <header className="grid grid-cols-1 sm:grid-cols-[1.2fr_2fr_1.2fr] gap-8 items-center w-full">
-          <div className="flex flex-col items-start gap-2">
-            <img src={logoCronex2} alt="Cronex" className="h-auto w-[380px] lg:w-[420px] object-contain" />
-            <div className="flex gap-6">
-                <div className="text-5xl font-black text-[#871F80]">{score} <span className="text-xl text-slate-400 uppercase">Pts</span></div>
-                <div className="text-5xl font-black text-red-500">{lives} <span className="text-xl text-slate-400 uppercase">Vidas</span></div>
+      {/* Header Escalable */}
+      <div className="flex-1 w-full px-[5vw] py-[3vw] flex flex-col gap-[2vw]">
+        <header className="grid grid-cols-[1.2fr_2fr_1.2fr] gap-[2vw] items-center w-full border-b-[0.2vw] border-slate-200 pb-[2vw]">
+          <div className="flex flex-col items-start gap-[1vw]">
+            <img src={logoCronex2} alt="Cronex" className="h-auto w-[18vw] object-contain" />
+            <div className="flex gap-[2vw]">
+                <div className="text-[3vw] font-black text-[#871F80] leading-none">{score} <span className="text-[1vw] text-slate-400 uppercase">Pts</span></div>
+                <div className="text-[3vw] font-black text-red-500 leading-none">{lives} <span className="text-[1vw] text-slate-400 uppercase">Vidas</span></div>
             </div>
           </div>
           <div className="flex justify-center items-center">
-            <img src={logoAlpha2} alt="Alpha Gaming" className="w-[70vw] sm:w-[45vw] lg:w-[28vw] max-w-[800px] h-auto object-contain" />
+            <img src={logoAlpha2} alt="Alpha Gaming" className="w-[25vw] h-auto object-contain" />
           </div>
-          <div className="flex flex-col items-center sm:items-end">
-             <Link to="/" className="group text-slate-400 font-bold hover:text-[#871F80] transition-colors uppercase tracking-widest text-xs">← VOLVER AL MENÚ</Link>
+          <div className="flex flex-col items-end">
+             <Link to="/" className="text-slate-400 font-bold hover:text-[#871F80] transition-colors uppercase tracking-widest text-[0.8vw]">← VOLVER AL MENÚ</Link>
           </div>
         </header>
 
-        <div className="flex-1 grid grid-cols-1 lg:grid-cols-12 gap-10">
+        <div className="flex-1 grid grid-cols-12 gap-[3vw]">
           
-          <aside className="lg:col-span-3 space-y-6">
-            <div className="bg-white/80 backdrop-blur-sm rounded-[2.5rem] p-8 border border-white shadow-xl">
-              <h3 className="text-xs font-black text-slate-400 mb-6 uppercase tracking-[0.3em]">Record</h3>
-              <div className="text-4xl font-black text-slate-800 tracking-tighter">{highScore.toLocaleString()}</div>
+          {/* ASIDE ESCALABLE */}
+          <aside className="col-span-3 space-y-[2vw]">
+            <div className="bg-white/80 backdrop-blur-sm rounded-[2vw] p-[2vw] border border-white shadow-xl">
+              <h3 className="text-[0.7vw] font-black text-slate-400 mb-[1vw] uppercase tracking-[0.3em]">Record</h3>
+              <div className="text-[2.5vw] font-black text-slate-800 tracking-tighter leading-none">{highScore.toLocaleString()}</div>
             </div>
 
-            <div className="bg-[#871F80] rounded-[2.5rem] p-8 text-white shadow-2xl">
-              <h3 className="text-xs font-black text-white/60 mb-4 uppercase tracking-[0.3em]">Controles</h3>
+            <div className="bg-[#871F80] rounded-[2vw] p-[2vw] text-white shadow-2xl">
+              <h3 className="text-[0.7vw] font-black text-white/60 mb-[1vw] uppercase tracking-[0.3em]">Controles</h3>
               
               {!gameActive ? (
                 <>
-                  <p className="font-bold text-sm leading-relaxed mb-6">Elige la velocidad antes de iniciar:</p>
-                  <div className="space-y-3 mb-6">
+                  <p className="font-bold text-[0.9vw] leading-relaxed mb-[1.5vw]">Velocidad:</p>
+                  <div className="space-y-[0.8vw] mb-[1.5vw]">
                     {(Object.keys(SPEEDS) as Array<keyof typeof SPEEDS>).map((level) => (
                       <button
                         key={level}
                         onClick={() => setSelectedSpeed(SPEEDS[level])}
-                        className={`w-full py-3 rounded-xl font-black text-sm transition-all border-2 ${
+                        className={`w-full py-[0.8vw] rounded-[0.8vw] font-black text-[0.9vw] transition-all border-[0.15vw] ${
                           selectedSpeed === SPEEDS[level] 
                           ? 'bg-white text-[#871F80] border-white scale-105 shadow-lg' 
                           : 'bg-transparent text-white border-white/30 hover:bg-white/10'
@@ -223,64 +175,60 @@ export default function GameLetras() {
                       </button>
                     ))}
                   </div>
-                  <button onClick={startGame} className="w-full bg-emerald-500 text-white py-4 rounded-xl font-black hover:bg-emerald-400 transition-all shadow-lg">
-                    ¡EMPEZAR JUEGO!
+                  <button onClick={startGame} className="w-full bg-emerald-500 text-white py-[1.2vw] rounded-[0.8vw] font-black text-[1vw] hover:bg-emerald-400 transition-all shadow-lg">
+                    ¡EMPEZAR!
                   </button>
                 </>
               ) : (
-                <div className="space-y-4">
+                <div className="space-y-[1vw]">
                   <button 
                     onClick={() => setIsPaused(!isPaused)} 
-                    className={`w-full py-4 rounded-xl font-black transition-all shadow-lg ${isPaused ? 'bg-emerald-500' : 'bg-yellow-500'}`}
+                    className={`w-full py-[1.2vw] rounded-[0.8vw] font-black text-[1vw] transition-all shadow-lg ${isPaused ? 'bg-emerald-500' : 'bg-yellow-500'}`}
                   >
-                    {isPaused ? 'REANUDAR' : 'PAUSAR JUEGO'}
+                    {isPaused ? 'REANUDAR' : 'PAUSAR'}
                   </button>
-                  <button 
-                    onClick={resetToMenu} 
-                    className="w-full bg-red-500 text-white py-4 rounded-xl font-black hover:bg-red-600 transition-all shadow-lg"
-                  >
-                    DETENER / SALIR
+                  <button onClick={resetToMenu} className="w-full bg-red-500 text-white py-[1.2vw] rounded-[0.8vw] font-black text-[1vw] hover:bg-red-600 transition-all shadow-lg">
+                    SALIR
                   </button>
                 </div>
               )}
             </div>
           </aside>
 
-          <section className="lg:col-span-9 relative">
-            <div className="bg-slate-900 rounded-[3.5rem] shadow-2xl border-[12px] border-white h-[650px] relative overflow-hidden">
+          {/* ÁREA DE JUEGO ESCALABLE */}
+          <section className="col-span-9 relative">
+            <div className="bg-slate-900 rounded-[3vw] shadow-2xl border-[0.8vw] border-white h-[35vw] relative overflow-hidden">
               
-              {/* Overlay de Feedback de Texto */}
+              {/* Overlay de Feedback */}
               {feedback && (
-                <div className="absolute top-10 left-0 right-0 z-[60] flex justify-center pointer-events-none animate-bounce">
-                  <span className="text-5xl font-black text-emerald-400 drop-shadow-[0_0_15px_rgba(52,211,153,0.7)] uppercase tracking-tighter">
+                <div className="absolute top-[2vw] left-0 right-0 z-[60] flex justify-center pointer-events-none animate-bounce">
+                  <span className="text-[4vw] font-black text-emerald-400 drop-shadow-[0_0_1.5vw_rgba(52,211,153,0.7)] uppercase">
                     {feedback}
                   </span>
                 </div>
               )}
 
-              {/* Overlay de Pausa Visual */}
+              {/* Overlay de Pausa */}
               {isPaused && (
                 <div className="absolute inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center">
-                  <div className="text-white text-6xl font-black tracking-tighter animate-pulse">JUEGO EN PAUSA</div>
+                  <div className="text-white text-[4vw] font-black tracking-tighter animate-pulse">PAUSA</div>
                 </div>
               )}
 
-              <div className="absolute inset-0 grid grid-cols-6 opacity-5 pointer-events-none">
-                {[...Array(6)].map((_, i) => <div key={i} className="border-r border-white h-full" />)}
+              {/* Zona de Acción */}
+              <div className="absolute bottom-[5%] left-0 right-0 h-[20%] bg-gradient-to-t from-[#871F80]/40 to-transparent border-t-[0.3vw] border-dashed border-[#871F80]/50 flex items-center justify-center">
+                <span className="text-[#871F80] font-black tracking-[1vw] opacity-30 text-[1.5vw] uppercase">Zona de Acción</span>
               </div>
 
-              <div className="absolute bottom-[5%] left-0 right-0 h-[20%] bg-gradient-to-t from-[#871F80]/40 to-transparent border-t-4 border-dashed border-[#871F80]/50 flex items-center justify-center">
-                <span className="text-[#871F80] font-black tracking-[1em] opacity-30 text-2xl uppercase">Zona de Acción</span>
-              </div>
-
+              {/* Ítems (Letras) escalables */}
               {items.map(item => (
                 <div
                   key={item.id}
                   style={{ left: `${item.x}%`, top: `${item.y}%`, transition: 'top 0.05s linear' }}
-                  className={`absolute w-16 h-16 flex items-center justify-center rounded-2xl font-black text-3xl shadow-xl border-b-4 transition-all
+                  className={`absolute w-[4vw] h-[4vw] flex items-center justify-center rounded-[0.8vw] font-black text-[2vw] shadow-xl border-b-[0.4vw] transition-all
                     ${item.isHit 
-                      ? 'bg-emerald-500 border-emerald-700 text-white scale-125 z-10' // Color verde al acertar
-                      : 'bg-white border-slate-300 text-slate-800' // Color normal
+                      ? 'bg-emerald-500 border-emerald-700 text-white scale-125 z-10' 
+                      : 'bg-white border-slate-300 text-slate-800'
                     }`}
                 >
                   {item.char}
@@ -288,10 +236,10 @@ export default function GameLetras() {
               ))}
 
               {!gameActive && items.length === 0 && (
-                <div className="absolute inset-0 flex flex-col items-center justify-center text-center p-10 bg-slate-900/60 backdrop-blur-sm">
-                   <div className="bg-white p-8 rounded-[2.5rem] shadow-2xl">
-                     <p className="text-[#871F80] font-black text-3xl mb-2 uppercase">Configura tu nivel</p>
-                     <p className="text-slate-400 font-bold">Elige la velocidad para comenzar</p>
+                <div className="absolute inset-0 flex flex-col items-center justify-center text-center p-[2vw] bg-slate-900/60 backdrop-blur-sm">
+                   <div className="bg-white p-[3vw] rounded-[2vw] shadow-2xl">
+                     <p className="text-[#871F80] font-black text-[2vw] mb-[0.5vw] uppercase">Configura tu nivel</p>
+                     <p className="text-slate-400 font-bold text-[1vw]">Elige la velocidad para comenzar</p>
                    </div>
                 </div>
               )}

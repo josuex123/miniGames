@@ -114,7 +114,7 @@ export default function GameDyno() {
       }
 
       const speed = Math.min(BASE_SPEED + scoreRef.current * SPEED_INCREMENT, MAX_SPEED);
-      setCurrentSpeed(speed); // SE USA AQUÍ
+      setCurrentSpeed(speed);
 
       obstacles.current = obstacles.current.map((obs) => ({
         ...obs,
@@ -194,7 +194,7 @@ export default function GameDyno() {
       <style>{`
         @keyframes wolf-walk {
           0%, 100% { transform: translateY(0); }
-          50% { transform: translateY(-3px); }
+          50% { transform: translateY(-0.2vw); }
         }
         @keyframes wolf-jump-fx {
           0% { transform: scale(1); }
@@ -205,14 +205,15 @@ export default function GameDyno() {
         .wolf-jump { animation: wolf-jump-fx 0.3s ease-out; }
       `}</style>
 
+      {/* MODAL FIN DEL JUEGO */}
       {isGameOver && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-slate-900/80 backdrop-blur-sm">
-          <div className="bg-white p-10 rounded-[2rem] shadow-2xl text-center border-b-8 border-[#871F80]">
-            <h2 className="text-5xl font-black text-slate-900 mb-2 italic tracking-tighter">FIN DEL JUEGO</h2>
-            <p className="text-2xl font-bold text-[#871F80] mb-2">PUNTUACIÓN: {score}</p>
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-[2vw] bg-slate-900/80 backdrop-blur-sm">
+          <div className="bg-white p-[4vw] rounded-[3vw] shadow-2xl text-center border-b-[0.6vw] border-[#871F80] max-w-[40vw]">
+            <h2 className="text-[4vw] font-black text-slate-900 mb-[1vw] italic tracking-tighter">FIN DEL JUEGO</h2>
+            <p className="text-[2vw] font-bold text-[#871F80] mb-[1.5vw]">PUNTUACIÓN: {score}</p>
             <button
               onClick={resetGame}
-              className="mt-6 bg-[#871F80] text-white px-12 py-4 rounded-xl font-black text-xl hover:brightness-110 active:scale-95 transition-all shadow-lg"
+              className="bg-[#871F80] text-white px-[4vw] py-[1.5vw] rounded-[1.2vw] font-black text-[1.5vw] hover:brightness-110 active:scale-95 transition-all shadow-lg"
             >
               VOLVER A JUGAR
             </button>
@@ -220,55 +221,57 @@ export default function GameDyno() {
         </div>
       )}
 
-      <div className="flex-1 w-full px-6 py-8 flex flex-col gap-6">
-        <header className="grid grid-cols-1 sm:grid-cols-[1.2fr_2fr_1.2fr] gap-8 items-center w-full">
-          <div className="flex flex-col items-start gap-2">
-            <img src={logoCronex2} alt="Cronex" className="h-auto w-[380px]" />
-            <div className="text-5xl font-black text-[#871F80] flex items-baseline gap-2">
-              {score} <span className="text-sm text-slate-400 uppercase font-bold tracking-widest">Points</span>
+      <div className="flex-1 w-full px-[5vw] py-[2.5vw] flex flex-col gap-[2.5vw]">
+        
+        {/* HEADER ESCALABLE */}
+        <header className="grid grid-cols-[1.2fr_2fr_1.2fr] gap-[2vw] items-center w-full">
+          <div className="flex flex-col items-start gap-[0.5vw]">
+            <img src={logoCronex2} alt="Cronex" className="h-auto w-[22vw] object-contain" />
+            <div className="text-[3.5vw] font-black text-[#871F80] flex items-baseline gap-[0.8vw] leading-none">
+              {score} <span className="text-[0.8vw] text-slate-400 uppercase font-bold tracking-widest">Points</span>
             </div>
-            <div className="text-xs text-slate-400">Record: <span className="text-[#871F80] font-bold">{highScore}</span></div>
+            <div className="text-[0.7vw] text-slate-400">Record: <span className="text-[#871F80] font-bold">{highScore}</span></div>
           </div>
 
           <div className="flex justify-center">
-            <img src={logoAlpha2} alt="Alpha Gaming" className="w-[70vw] sm:w-[32vw] h-auto object-contain" />
+            <img src={logoAlpha2} alt="Alpha Gaming" className="w-[32vw] h-auto object-contain" />
           </div>
 
-          <div className="flex flex-col items-end gap-2">
-            <Link to="/" className="text-slate-400 font-bold hover:text-[#871F80] transition-colors uppercase tracking-widest text-xs">
+          <div className="flex flex-col items-end gap-[0.5vw]">
+            <Link to="/" className="text-slate-400 font-bold hover:text-[#871F80] transition-colors uppercase tracking-widest text-[0.8vw]">
               ← VOLVER AL MENÚ
             </Link>
-            {/* ESTA LÍNEA USA LA VARIABLE Y EVITA EL ERROR DE TS */}
-            <div className="text-xs text-slate-400">
+            <div className="text-[0.7vw] text-slate-400">
               Velocidad: <span className="text-[#871F80] font-bold">{currentSpeed.toFixed(1)}x</span>
             </div>
           </div>
         </header>
 
-        <section className="flex-1 flex flex-col items-center justify-center gap-8">
-          <div className="w-full max-w-5xl h-64 bg-white rounded-[2rem] shadow-inner border-2 border-slate-200 relative overflow-hidden select-none">
+        {/* ÁREA DE JUEGO */}
+        <section className="flex-1 flex flex-col items-center justify-center gap-[3vw]">
+          <div className="w-full max-w-[70vw] h-[18vw] bg-white rounded-[3vw] shadow-inner border-[0.2vw] border-slate-200 relative overflow-hidden select-none">
             
-            {/* Nubes originales */}
-            <div className="absolute top-10 w-12 h-4 bg-slate-100 rounded-full" style={{ right: `${10 + (score % 20)}%` }} />
-            <div className="absolute top-20 w-16 h-5 bg-slate-100 rounded-full" style={{ left: `${15 + (score % 15)}%` }} />
-            <div className="absolute top-6 w-10 h-3 bg-slate-100 rounded-full" style={{ left: `${50 + (score % 25)}%` }} />
+            {/* Nubes escalables */}
+            <div className="absolute top-[3vw] w-[3vw] h-[1vw] bg-slate-100 rounded-full" style={{ right: `${10 + (score % 20)}%` }} />
+            <div className="absolute top-[6vw] w-[4vw] h-[1.2vw] bg-slate-100 rounded-full" style={{ left: `${15 + (score % 15)}%` }} />
+            <div className="absolute top-[2vw] w-[2.5vw] h-[0.8vw] bg-slate-100 rounded-full" style={{ left: `${50 + (score % 25)}%` }} />
 
             {/* Suelo */}
-            <div className="absolute bottom-6 w-full h-[2px] bg-slate-200" />
+            <div className="absolute bottom-[2vw] w-full h-[0.1vw] bg-slate-200" />
 
             {!isGameStarted && (
               <div className="absolute inset-0 flex flex-col items-center justify-center bg-white/90 z-30">
-                <h2 className="text-3xl font-black text-slate-900 mb-2 italic tracking-tighter">WOLF RUN</h2>
-                <button onClick={startGame} className="bg-[#871F80] text-white px-10 py-4 rounded-xl font-black text-xl shadow-lg transition-all">
+                <h2 className="text-[2.5vw] font-black text-slate-900 mb-[1vw] italic tracking-tighter">WOLF RUN</h2>
+                <button onClick={startGame} className="bg-[#871F80] text-white px-[3vw] py-[1.2vw] rounded-[1vw] font-black text-[1.5vw] shadow-lg transition-all">
                   COMENZAR
                 </button>
               </div>
             )}
 
-            {/* LOBO: Alineado con bottom-6 */}
+            {/* LOBO: Escalado con vw */}
             <div
-              style={{ transform: `translateY(${visualDinoY}px)` }}
-              className="absolute bottom-6 left-24 w-20 h-32 z-20"
+              style={{ transform: `translateY(${visualDinoY * 0.1}vw)` }} // Escalamiento de la física a visual vw
+              className="absolute bottom-[2vw] left-[8vw] w-[6vw] h-[8vw] z-20"
             >
               <img 
                 src={wolfImage} 
@@ -279,28 +282,28 @@ export default function GameDyno() {
               />
             </div>
 
-            {/* Obstáculos originales alineados con bottom-6 */}
+            {/* Obstáculos escalables */}
             {visualObstacles.map((obs) => (
               <div
                 key={obs.id}
                 style={{ left: `${obs.x}%` }}
-                className="absolute bottom-6 z-10"
+                className="absolute bottom-[2vw] z-10"
               >
                 {obs.type === 'cactus' ? (
-                  <div className="w-10 h-14 flex items-end justify-center">
-                    <div className="w-4 h-full bg-slate-800 rounded-t-full relative">
-                      <div className="absolute left-[-8px] top-4 w-4 h-6 border-l-4 border-t-4 border-slate-800 rounded-tl-lg" />
-                      <div className="absolute right-[-6px] top-2 w-4 h-8 border-r-4 border-t-4 border-slate-800 rounded-tr-lg" />
+                  <div className="w-[3vw] h-[4vw] flex items-end justify-center">
+                    <div className="w-[1vw] h-full bg-slate-800 rounded-t-full relative">
+                      <div className="absolute left-[-0.5vw] top-[1vw] w-[0.8vw] h-[1.5vw] border-l-[0.25vw] border-t-[0.25vw] border-slate-800 rounded-tl-[0.5vw]" />
+                      <div className="absolute right-[-0.4vw] top-[0.5vw] w-[0.8vw] h-[2vw] border-r-[0.25vw] border-t-[0.25vw] border-slate-800 rounded-tr-[0.5vw]" />
                     </div>
                   </div>
                 ) : (
-                  <div className="w-16 h-16 flex gap-1 items-end">
-                    <div className="w-3 h-12 bg-slate-800 rounded-t-full relative">
-                      <div className="absolute left-[-6px] top-3 w-3 h-5 border-l-3 border-t-3 border-slate-800 rounded-tl-lg" />
+                  <div className="w-[5vw] h-[5vw] flex gap-[0.2vw] items-end">
+                    <div className="w-[0.8vw] h-[3.5vw] bg-slate-800 rounded-t-full relative">
+                      <div className="absolute left-[-0.4vw] top-[1vw] w-[0.6vw] h-[1.2vw] border-l-[0.18vw] border-t-[0.18vw] border-slate-800 rounded-tl-[0.3vw]" />
                     </div>
-                    <div className="w-4 h-16 bg-slate-800 rounded-t-full relative">
-                      <div className="absolute left-[-7px] top-4 w-4 h-6 border-l-4 border-t-4 border-slate-800 rounded-tl-lg" />
-                      <div className="absolute right-[-5px] top-2 w-4 h-7 border-r-4 border-t-4 border-slate-800 rounded-tr-lg" />
+                    <div className="w-[1vw] h-[4.5vw] bg-slate-800 rounded-t-full relative">
+                      <div className="absolute left-[-0.5vw] top-[1.2vw] w-[0.8vw] h-[1.5vw] border-l-[0.25vw] border-t-[0.25vw] border-slate-800 rounded-tl-[0.5vw]" />
+                      <div className="absolute right-[-0.4vw] top-[0.8vw] w-[0.8vw] h-[1.8vw] border-r-[0.25vw] border-t-[0.25vw] border-slate-800 rounded-tr-[0.5vw]" />
                     </div>
                   </div>
                 )}
@@ -310,7 +313,7 @@ export default function GameDyno() {
 
           <button
             onMouseDown={jump}
-            className="bg-[#871F80] text-white px-20 py-6 rounded-2xl font-black text-2xl shadow-xl transition-all uppercase italic"
+            className="bg-[#871F80] text-white px-[6vw] py-[2vw] rounded-[1.5vw] font-black text-[2vw] shadow-xl transition-all uppercase italic"
           >
             SALTAR!
           </button>
