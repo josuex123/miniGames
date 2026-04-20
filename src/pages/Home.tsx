@@ -27,11 +27,11 @@ export default function Home() {
       <header className="w-full grid grid-cols-[1fr_2fr_1fr] items-center border-b-[0.2vw] border-slate-200 pb-[3vw] mb-[4vw] shrink-0">
         
         {/* LOGO IZQUIERDO: Escala con el ancho */}
-        <div className="flex justify-start">
+        <div className="flex flex-col items-start gap-[1vw]">
           <img
             src={logoCronex2}
             alt="Cronex"
-            className="w-[10vw] h-auto object-contain" 
+            className="h-auto w-[18vw] object-contain" 
           />
         </div>
 

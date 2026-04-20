@@ -98,7 +98,7 @@ export default function GameHangMan() {
               {isWinner ? "Eres un experto ✨" : `La palabra era: ${wordToGuess} ⌛`}
             </p>
             <button onClick={resetAfterModal} className="bg-white text-slate-900 px-[3vw] py-[1.2vw] rounded-[1.5vw] font-black text-[1.2vw] hover:scale-105 active:scale-95 transition-transform shadow-lg">
-              CONTINUAR
+              VOLVER A JUGAR
             </button>
           </div>
         </div>
