@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import logoAlpha2 from '../../assets/LogoAlphaGaming2.svg';
 import logoCronex2 from '../../assets/LogoCronex2.svg';
+import GameOverModal from '../../components/GameOverModal';
 
 // --- CONFIGURACIÓN ---
 const ROAD_WIDTH = 350;
@@ -140,21 +141,16 @@ export default function GameCars() {
   return (
     <main className="min-h-screen bg-[#F8FAFC] flex flex-col font-sans text-slate-900 relative antialiased overflow-hidden">
       
-      {/* MODAL GAME OVER ESCALABLE */}
-      {isGameOver && (
-        <div className="fixed inset-0 z-[120] flex items-center justify-center p-[2vw] bg-slate-900/60 backdrop-blur-md">
-          <div className="bg-white p-[4vw] rounded-[3vw] shadow-2xl text-center border-[0.3vw] border-[#871F80] max-w-[40vw]">
-            <h2 className="text-[4vw] font-black text-slate-900 mb-[0.5vw] italic">¡SYSTEM FAILURE!</h2>
-            <p className="text-[1.2vw] font-bold text-slate-400 mb-[2vw] uppercase tracking-widest">Score Final: {score}</p>
-            <button onClick={handleAction} className="bg-[#871F80] text-white px-[3vw] py-[1.2vw] rounded-[1.2vw] font-black text-[1.2vw] hover:scale-105 active:scale-95 transition-transform shadow-lg">
-              REPARAR MOUSE
-            </button>
-          </div>
-        </div>
-      )}
+      <GameOverModal
+        isOpen={isGameOver}
+        title="¡SYSTEM FAILURE!"
+        message={`Score Final: ${score}`}
+        onRetry={handleAction}
+        variant="lose"
+      />
 
       {/* HEADER ESCALABLE */}
-      <header className="w-full px-[5vw] py-[2.5vw] grid grid-cols-[1.2fr_2fr_1.2fr] gap-[2vw] items-center z-10">
+      <header className="w-full px-[5vw] py-[2.5vw] grid grid-cols-[1.2fr_2fr_1.2fr] gap-[2vw] items-center z-10 border-b-[0.2vw] border-slate-200 pb-[2vw]">
         <div className="flex flex-col items-start gap-[0.5vw]">
           <img src={logoCronex2} alt="Cronex" className="h-auto w-[20vw] object-contain" />
           <div className="text-[3.5vw] font-black text-[#871F80] leading-none">

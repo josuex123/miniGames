@@ -2,6 +2,7 @@ import { useState, useCallback, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import logoAlpha2 from '../../assets/LogoAlphaGaming2.svg';
 import logoCronex2 from '../../assets/LogoCronex2.svg';
+import GameOverModal from '../../components/GameOverModal';
 
 // Constantes del juego
 const GRID_WIDTH = 10;
@@ -198,6 +199,14 @@ export default function GameTetris() {
   return (
     <main className="min-h-screen bg-[#F8FAFC] flex flex-col font-sans text-slate-900 relative antialiased overflow-hidden">
       
+      <GameOverModal
+        isOpen={isGameOver}
+        title="GAME OVER"
+        message={`Puntuación: ${score}`}
+        onRetry={resetGame}
+        variant="lose"
+      />
+
       {/* HEADER ESCALABLE (Proporción 1920x1080) */}
       <div className="w-full px-[5vw] py-[3vw] flex flex-col gap-[2vw]">
         <header className="grid grid-cols-[1.2fr_2fr_1.2fr] gap-[2vw] items-center w-full border-b-[0.2vw] border-slate-200 pb-[2vw]">
@@ -252,15 +261,7 @@ export default function GameTetris() {
                 )}
               </div>
 
-              {/* OVERLAY GAME OVER */}
-              {isGameOver && (
-                <div className="absolute inset-0 bg-black/80 flex flex-col items-center justify-center gap-[1.5vw] z-50">
-                  <div className="text-white text-[2vw] font-black uppercase tracking-widest text-center">GAME OVER</div>
-                  <button onClick={resetGame} className="bg-[#871F80] hover:bg-[#6B1860] text-white font-bold py-[0.8vw] px-[2vw] rounded-[0.8vw] transition-all text-[1vw]">
-                    REINTENTAR
-                  </button>
-                </div>
-              )}
+
 
               {/* OVERLAY INICIO */}
               {!isGameStarted && !isGameOver && (

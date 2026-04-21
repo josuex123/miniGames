@@ -3,6 +3,7 @@ import type { ChangeEvent } from 'react';
 import logoAlpha2 from '../../assets/LogoAlphaGaming2.svg';
 import logoCronex2 from '../../assets/LogoCronex2.svg';
 import { Link } from 'react-router-dom';
+import GameOverModal from '../../components/GameOverModal';
 
 interface WordConfig {
   word: string;
@@ -93,24 +94,13 @@ export default function GameSetWord() {
   return (
     <main className="min-h-screen bg-[#F8FAFC] flex flex-col font-sans text-slate-900 relative antialiased overflow-hidden">
 
-      {/* MODAL DE ESTADO ESCALABLE */}
-      {(gameState === 'round-win' || gameState === 'lost') && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-[2vw] bg-slate-900/40 backdrop-blur-md">
-          <div className={`relative p-[4vw] rounded-[4vw] shadow-2xl text-center max-w-[40vw] w-full border-[0.3vw] animate-in zoom-in duration-300 ${gameState === 'round-win' ? "bg-emerald-500 border-emerald-300 shadow-emerald-500/50" : "bg-red-500 border-red-300 shadow-red-500/50"}`}>
-            <div className="animate-pulse">
-              <h2 className="text-[4vw] font-black text-white uppercase mb-[1vw] tracking-tighter drop-shadow-md">
-                {gameState === 'round-win' ? "¡Victoria!" : "¡Tiempo Agotado!"}
-              </h2>
-              <p className="text-white/90 text-[1.5vw] font-bold mb-[2.5vw]">
-                {gameState === 'round-win' ? `Lo lograste en ${seconds} segundos ✨` : "Inténtalo de nuevo, ¡tú puedes! ⌛"}
-              </p>
-            </div>
-            <button onClick={resetRound} className="bg-white text-slate-900 px-[3vw] py-[1.2vw] rounded-[1.5vw] font-black text-[1.2vw] hover:scale-105 active:scale-95 transition-transform shadow-lg">
-              CONTINUAR
-            </button>
-          </div>
-        </div>
-      )}
+      <GameOverModal
+        isOpen={gameState === 'round-win' || gameState === 'lost'}
+        title={gameState === 'round-win' ? "¡Victoria!" : "¡Tiempo Agotado!"}
+        message={gameState === 'round-win' ? `Lo lograste en ${seconds} segundos ✨` : "Inténtalo de nuevo, ¡tú puedes! ⌛"}
+        onRetry={resetRound}
+        variant={gameState === 'round-win' ? "win" : "lose"}
+      />
 
       {/* Barra de Progreso Superior */}
       <div className="fixed top-0 left-0 h-[0.4vw] bg-slate-200 w-full z-50">
@@ -123,7 +113,7 @@ export default function GameSetWord() {
       <div className="flex-1 w-full px-[5vw] py-[3vw] flex flex-col gap-[3vw]">
         
         {/* HEADER ESCALABLE */}
-        <header className="grid grid-cols-[1.2fr_2fr_1.2fr] gap-[2vw] items-center w-full pb-[2vw] border-b-[0.1vw] border-slate-200">
+        <header className="grid grid-cols-[1.2fr_2fr_1.2fr] gap-[2vw] items-center w-full pb-[2vw] border-b-[0.2vw] border-slate-200">
           {/* 1. Logo Cronex + Tiempo */}
           <div className="flex flex-col items-start gap-[0.5vw]">
             <img src={logoCronex2} alt="Cronex" className="h-auto w-[22vw] object-contain" />

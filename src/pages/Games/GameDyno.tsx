@@ -2,7 +2,8 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import logoAlpha2 from '../../assets/LogoAlphaGaming2.svg';
 import logoCronex2 from '../../assets/LogoCronex2.svg';
-import wolfImage from '../../assets/WolfGame.png'; 
+import wolfImage from '../../assets/WolfGame.png';
+import GameOverModal from '../../components/GameOverModal';
 
 const GRAVITY = 0.45;
 const JUMP_FORCE = -11;
@@ -205,26 +206,18 @@ export default function GameDyno() {
         .wolf-jump { animation: wolf-jump-fx 0.3s ease-out; }
       `}</style>
 
-      {/* MODAL FIN DEL JUEGO */}
-      {isGameOver && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-[2vw] bg-slate-900/80 backdrop-blur-sm">
-          <div className="bg-white p-[4vw] rounded-[3vw] shadow-2xl text-center border-b-[0.6vw] border-[#871F80] max-w-[40vw]">
-            <h2 className="text-[4vw] font-black text-slate-900 mb-[1vw] italic tracking-tighter">FIN DEL JUEGO</h2>
-            <p className="text-[2vw] font-bold text-[#871F80] mb-[1.5vw]">PUNTUACIÓN: {score}</p>
-            <button
-              onClick={resetGame}
-              className="bg-[#871F80] text-white px-[4vw] py-[1.5vw] rounded-[1.2vw] font-black text-[1.5vw] hover:brightness-110 active:scale-95 transition-all shadow-lg"
-            >
-              VOLVER A JUGAR
-            </button>
-          </div>
-        </div>
-      )}
+      <GameOverModal
+        isOpen={isGameOver}
+        title="FIN DEL JUEGO"
+        message={`Puntuación: ${score}`}
+        onRetry={resetGame}
+        variant="lose"
+      />
 
       <div className="flex-1 w-full px-[5vw] py-[2.5vw] flex flex-col gap-[2.5vw]">
         
         {/* HEADER ESCALABLE */}
-        <header className="grid grid-cols-[1.2fr_2fr_1.2fr] gap-[2vw] items-center w-full">
+        <header className="grid grid-cols-[1.2fr_2fr_1.2fr] gap-[2vw] items-center w-full border-b-[0.2vw] border-slate-200 pb-[1.5vw]">
           <div className="flex flex-col items-start gap-[0.5vw]">
             <img src={logoCronex2} alt="Cronex" className="h-auto w-[22vw] object-contain" />
             <div className="text-[3.5vw] font-black text-[#871F80] flex items-baseline gap-[0.8vw] leading-none">

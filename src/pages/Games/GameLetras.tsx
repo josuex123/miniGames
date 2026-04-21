@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import logoAlpha2 from '../../assets/LogoAlphaGaming2.svg';
 import logoCronex2 from '../../assets/LogoCronex2.svg';
+import GameOverModal from '../../components/GameOverModal';
 
 // --- INTERFACES ---
 interface FallingItem {
@@ -19,7 +20,7 @@ const SPEEDS = {
   RÁPIDO: 0.6
 };
 
-const SPAWN_RATE = 1500; 
+const SPAWN_RATE = 1500;
 const HIT_ZONE_MIN = 75;
 const HIT_ZONE_MAX = 95;
 
@@ -42,7 +43,7 @@ export default function GameLetras() {
     return {
       id: Math.random() + Date.now(),
       char: chars.charAt(Math.floor(Math.random() * chars.length)),
-      x: Math.floor(Math.random() * 85), 
+      x: Math.floor(Math.random() * 85),
       y: -10,
       speed: selectedSpeed,
       isHit: false
@@ -96,11 +97,11 @@ export default function GameLetras() {
   useEffect(() => {
     const messages = ["¡MUY BIEN!", "¡OK!", "¡GENIAL!", "¡EXCELENTE!", "¡BUENA!"];
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (!gameActive || isPaused) return; 
+      if (!gameActive || isPaused) return;
       const key = e.key.toUpperCase();
 
       setItems(prev => {
-        const targetIndex = prev.findIndex(item => 
+        const targetIndex = prev.findIndex(item =>
           item.char === key && item.y >= HIT_ZONE_MIN && item.y <= HIT_ZONE_MAX && !item.isHit
         );
 
@@ -112,9 +113,9 @@ export default function GameLetras() {
           const newItems = [...prev];
           const hitItem = { ...newItems[targetIndex], isHit: true };
           newItems[targetIndex] = hitItem;
-          
-          setTimeout(() => { 
-            setItems(current => current.filter(i => i.id !== hitItem.id)); 
+
+          setTimeout(() => {
+            setItems(current => current.filter(i => i.id !== hitItem.id));
           }, 150);
 
           return newItems;
@@ -136,72 +137,52 @@ export default function GameLetras() {
     }
   }, [lives, gameActive, score, highScore]);
 
-  const startGame = () => { 
-    setScore(0); 
-    setLives(10); 
-    setItems([]); 
-    setGameActive(true); 
-    setIsPaused(false); 
-    setFeedback(""); 
+  const startGame = () => {
+    setScore(0);
+    setLives(10);
+    setItems([]);
+    setGameActive(true);
+    setIsPaused(false);
+    setFeedback("");
     setShowGameOver(false);
     lastSpawnRef.current = 0;
   };
 
-  const resetToMenu = () => { 
-    setGameActive(false); 
-    setIsPaused(false); 
-    setItems([]); 
-    setScore(0); 
-    setFeedback(""); 
+  const resetToMenu = () => {
+    setGameActive(false);
+    setIsPaused(false);
+    setItems([]);
+    setScore(0);
+    setFeedback("");
     setShowGameOver(false);
     lastSpawnRef.current = 0;
   };
 
   return (
     <main className="min-h-screen bg-[#F8FAFC] flex flex-col font-sans text-slate-900 relative antialiased overflow-hidden">
-      
-      {/* MODAL DE ESTADO ESCALABLE (NUEVO) */}
-      {showGameOver && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-[2vw] bg-slate-900/40 backdrop-blur-md">
-          <div className="relative p-[4vw] rounded-[4vw] shadow-2xl text-center max-w-[40vw] w-full border-[0.3vw] animate-in zoom-in duration-300 bg-red-500 border-red-300 shadow-red-500/50">
-            <h2 className="text-[4vw] font-black text-white uppercase mb-[1vw] tracking-tighter drop-shadow-md">
-              ¡GAME OVER!
-            </h2>
-            <p className="text-white/90 text-[1.5vw] font-bold mb-[2.5vw] uppercase">
-              Puntaje obtenido: {score} ✨
-            </p>
-            <div className="flex flex-col gap-[1vw] items-center">
-              <button 
-                onClick={resetToMenu} 
-                className="bg-white text-slate-900 px-[3vw] py-[1.2vw] rounded-[1.5vw] font-black text-[1.2vw] hover:scale-105 active:scale-95 transition-transform shadow-lg w-fit"
-              >
-                VOLVER A JUGAR
-              </button>
-              <button 
-                onClick={resetToMenu} 
-                className="text-white/80 underline font-bold text-[1vw] hover:text-white transition-colors"
-              >
-                IR AL MENÚ
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+
+      <GameOverModal
+        isOpen={showGameOver}
+        title="¡GAME OVER!"
+        message={`Puntaje obtenido: ${score} ✨`}
+        onRetry={resetToMenu}
+        variant="lose"
+      />
 
       <div className="flex-1 w-full px-[5vw] py-[3vw] flex flex-col gap-[2vw]">
         <header className="grid grid-cols-[1.2fr_2fr_1.2fr] gap-[2vw] items-center w-full border-b-[0.2vw] border-slate-200 pb-[2vw]">
           <div className="flex flex-col items-start gap-[1vw]">
             <img src={logoCronex2} alt="Cronex" className="h-auto w-[18vw] object-contain" />
+          </div>
+          <div className="flex flex-col items-center gap-[1vw]">
             <div className="flex gap-[2vw]">
-                <div className="text-[3vw] font-black text-[#871F80] leading-none">{score} <span className="text-[1vw] text-slate-400 uppercase">Pts</span></div>
-                <div className="text-[3vw] font-black text-red-500 leading-none">{lives} <span className="text-[1vw] text-slate-400 uppercase">Vidas</span></div>
+              <div className="text-[3vw] font-black text-[#871F80] leading-none">{score} <span className="text-[1vw] text-slate-400 uppercase">Pts</span></div>
+              <div className="text-[3vw] font-black text-red-500 leading-none">{lives} <span className="text-[1vw] text-slate-400 uppercase">Vidas</span></div>
             </div>
           </div>
-          <div className="flex justify-center items-center">
+          <div className="flex flex-col items-end gap-[1vw]">
             <img src={logoAlpha2} alt="Alpha Gaming" className="w-[25vw] h-auto object-contain" />
-          </div>
-          <div className="flex flex-col items-end">
-             <Link to="/" className="text-slate-400 font-bold hover:text-[#871F80] transition-colors uppercase tracking-widest text-[0.8vw]">← VOLVER AL MENÚ</Link>
+            <Link to="/" className="text-slate-400 font-bold hover:text-[#871F80] transition-colors uppercase tracking-widest text-[0.8vw]">← VOLVER AL MENÚ</Link>
           </div>
         </header>
 
@@ -214,7 +195,7 @@ export default function GameLetras() {
 
             <div className="bg-[#871F80] rounded-[2vw] p-[2vw] text-white shadow-2xl">
               <h3 className="text-[0.7vw] font-black text-white/60 mb-[1vw] uppercase tracking-[0.3em]">Controles</h3>
-              
+
               {!gameActive ? (
                 <>
                   <p className="font-bold text-[0.9vw] leading-relaxed mb-[1.5vw]">Velocidad:</p>
@@ -223,11 +204,10 @@ export default function GameLetras() {
                       <button
                         key={level}
                         onClick={() => setSelectedSpeed(SPEEDS[level])}
-                        className={`w-full py-[0.8vw] rounded-[0.8vw] font-black text-[0.9vw] transition-all border-[0.15vw] ${
-                          selectedSpeed === SPEEDS[level] 
-                          ? 'bg-white text-[#871F80] border-white scale-105 shadow-lg' 
-                          : 'bg-transparent text-white border-white/30 hover:bg-white/10'
-                        }`}
+                        className={`w-full py-[0.8vw] rounded-[0.8vw] font-black text-[0.9vw] transition-all border-[0.15vw] ${selectedSpeed === SPEEDS[level]
+                            ? 'bg-white text-[#871F80] border-white scale-105 shadow-lg'
+                            : 'bg-transparent text-white border-white/30 hover:bg-white/10'
+                          }`}
                       >
                         {level}
                       </button>
@@ -239,8 +219,8 @@ export default function GameLetras() {
                 </>
               ) : (
                 <div className="space-y-[1vw]">
-                  <button 
-                    onClick={() => setIsPaused(!isPaused)} 
+                  <button
+                    onClick={() => setIsPaused(!isPaused)}
                     className={`w-full py-[1.2vw] rounded-[0.8vw] font-black text-[1vw] transition-all shadow-lg ${isPaused ? 'bg-emerald-500' : 'bg-yellow-500'}`}
                   >
                     {isPaused ? 'REANUDAR' : 'PAUSAR'}
@@ -255,7 +235,7 @@ export default function GameLetras() {
 
           <section className="col-span-9 relative">
             <div className="bg-slate-900 rounded-[3vw] shadow-2xl border-[0.8vw] border-white h-[35vw] relative overflow-hidden">
-              
+
               {feedback && (
                 <div className="absolute top-[2vw] left-0 right-0 z-[60] flex justify-center pointer-events-none animate-bounce">
                   <span className="text-[4vw] font-black text-emerald-400 drop-shadow-[0_0_1.5vw_rgba(52,211,153,0.7)] uppercase">
@@ -279,8 +259,8 @@ export default function GameLetras() {
                   key={item.id}
                   style={{ left: `${item.x}%`, top: `${item.y}%` }}
                   className={`absolute w-[4vw] h-[4vw] flex items-center justify-center rounded-[0.8vw] font-black text-[2vw] shadow-xl border-b-[0.4vw] transition-[transform,background-color] duration-150
-                    ${item.isHit 
-                      ? 'bg-emerald-500 border-emerald-700 text-white scale-125 z-10' 
+                    ${item.isHit
+                      ? 'bg-emerald-500 border-emerald-700 text-white scale-125 z-10'
                       : 'bg-white border-slate-300 text-slate-800'
                     }`}
                 >
@@ -290,10 +270,10 @@ export default function GameLetras() {
 
               {!gameActive && items.length === 0 && !showGameOver && (
                 <div className="absolute inset-0 flex flex-col items-center justify-center text-center p-[2vw] bg-slate-900/60 backdrop-blur-sm">
-                   <div className="bg-white p-[3vw] rounded-[2vw] shadow-2xl">
-                     <p className="text-[#871F80] font-black text-[2vw] mb-[0.5vw] uppercase">Configura tu nivel</p>
-                     <p className="text-slate-400 font-bold text-[1vw]">Elige la velocidad para comenzar</p>
-                   </div>
+                  <div className="bg-white p-[3vw] rounded-[2vw] shadow-2xl">
+                    <p className="text-[#871F80] font-black text-[2vw] mb-[0.5vw] uppercase">Configura tu nivel</p>
+                    <p className="text-slate-400 font-bold text-[1vw]">Elige la velocidad para comenzar</p>
+                  </div>
                 </div>
               )}
             </div>
