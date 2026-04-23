@@ -139,8 +139,8 @@ export default function GameCars() {
   };
 
   return (
-    <main className="min-h-screen bg-[#F8FAFC] flex flex-col font-sans text-slate-900 relative antialiased overflow-hidden">
-      
+    <div className="w-screen h-screen bg-black flex items-center justify-center overflow-hidden">
+      <main className="w-full max-w-[100vw] max-h-[100vh] aspect-[3/2] bg-[#F8FAFC] flex flex-col font-sans text-slate-900 relative antialiased overflow-hidden shadow-2xl">
       <GameOverModal
         isOpen={isGameOver}
         title="¡SYSTEM FAILURE!"
@@ -149,7 +149,6 @@ export default function GameCars() {
         variant="lose"
       />
 
-      {/* HEADER ESCALABLE */}
       <header className="w-full px-[5vw] py-[2.5vw] grid grid-cols-[1.2fr_2fr_1.2fr] gap-[2vw] items-center z-10 border-b-[0.2vw] border-slate-200 pb-[2vw]">
         <div className="flex flex-col items-start gap-[0.5vw]">
           <img src={logoCronex2} alt="Cronex" className="h-auto w-[20vw] object-contain" />
@@ -165,17 +164,14 @@ export default function GameCars() {
         </div>
       </header>
 
-      {/* ÁREA CENTRAL DE JUEGO ESCALABLE */}
       <div className="flex-1 flex justify-center items-start gap-[2vw] px-[2vw]">
         <div className="bg-white p-[1.5vw] rounded-[3vw] shadow-2xl border border-slate-100 flex gap-[2vw]">
           
-          {/* CARRETERA (MOUSEPAD) - ESCALADO PROPORCIONAL A 600px */}
           <div className="w-[20vw] h-[34vw] bg-slate-800 rounded-[1.5vw] border-[0.5vw] border-slate-700 relative shadow-inner overflow-hidden">
             <div className={`absolute left-1/2 -translate-x-1/2 w-[0.15vw] h-[200%] border-l-[0.2vw] border-dashed border-white/10 ${gameStarted && !isGameOver ? 'animate-road' : ''}`} />
 
-            {/* JUGADOR: MOUSE GAMER */}
             <div
-              style={{ transform: `translateX(${carX * 0.055}vw)` }} // Ajuste visual de la traslación a vw
+              style={{ transform: `translateX(${carX * 0.055}vw)` }} 
               className="absolute bottom-[3vw] left-1/2 -translate-x-1/2 w-[3.5vw] h-[5.5vw] bg-slate-100 rounded-[1.2vw_1.2vw_1.5vw_1.5vw] shadow-[0_0.6vw_0_rgba(0,0,0,0.3)] border-b-[0.4vw] border-slate-300 transition-transform duration-75 ease-out z-20 flex flex-col items-center"
             >
               <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[0.1vw] h-[2vw] bg-slate-300" />
@@ -232,7 +228,6 @@ export default function GameCars() {
         </div>
       </div>
 
-      {/* CONTROLES INFERIORES ESCALABLES */}
       <div className="p-[3vw] flex justify-center gap-[2vw]">
         <button onMouseDown={moveLeft} className="w-[6vw] h-[6vw] bg-white rounded-[1.5vw] shadow-lg border-b-[0.3vw] border-slate-200 font-black text-[#871F80] text-[2.5vw] active:translate-y-[0.2vw] transition-all select-none">←</button>
         <button onMouseDown={moveRight} className="w-[6vw] h-[6vw] bg-white rounded-[1.5vw] shadow-lg border-b-[0.3vw] border-slate-200 font-black text-[#871F80] text-[2.5vw] active:translate-y-[0.2vw] transition-all select-none">→</button>
@@ -245,6 +240,8 @@ export default function GameCars() {
         }
         .animate-road { animation: road-move 0.6s linear infinite; }
       `}</style>
-    </main>
+      </main>
+    </div>
+
   );
 }

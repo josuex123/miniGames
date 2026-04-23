@@ -195,9 +195,9 @@ export default function GameTetris() {
   const displayGrid = renderGame();
 
   return (
-    <main className="min-h-screen bg-[#F8FAFC] flex flex-col font-sans text-slate-900 relative antialiased overflow-hidden">
-      
-      <GameOverModal
+    <div className="w-screen h-screen bg-black flex items-center justify-center overflow-hidden">
+      <main className="w-full max-w-[100vw] max-h-[100vh] aspect-[3/2] bg-[#F8FAFC] flex flex-col font-sans text-slate-900 relative antialiased overflow-hidden shadow-2xl">
+       <GameOverModal
         isOpen={isGameOver}
         title="GAME OVER"
         message={`Puntuación: ${score}`}
@@ -318,6 +318,8 @@ export default function GameTetris() {
           </div>
         </div>
       </div>
-    </main>
+      </main>
+    </div>
+  
   );
 }

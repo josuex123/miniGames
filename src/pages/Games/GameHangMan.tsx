@@ -81,12 +81,9 @@ export default function GameHangMan() {
   const KEYS = 'QWERTYUIOPASDFGHJKLZXCVBNMÑ'.split('');
 
   return (
-    <main className="min-h-screen bg-[#F8FAFC] flex flex-col font-sans text-slate-900 relative antialiased overflow-hidden">
-      
-      {/* IMPLEMENTACIÓN DEL COMPONENTE EXTERNO 
-          Pasamos el mensaje dinámico con la palabra si pierde
-      */}
-      <GameOverModal 
+    <div className="w-screen h-screen bg-black flex items-center justify-center overflow-hidden">
+      <main className="w-full max-w-[100vw] max-h-[100vh] aspect-[3/2] bg-[#F8FAFC] flex flex-col font-sans text-slate-900 relative antialiased overflow-hidden shadow-2xl">
+       <GameOverModal 
         isOpen={isGameOver}
         variant={isWinner ? 'win' : 'lose'}
         title={isWinner ? "¡LO LOGRASTE!" : "¡AHORCADO!"}
@@ -212,6 +209,8 @@ export default function GameHangMan() {
           </section>
         </div>
       </div>
-    </main>
+      </main>
+    </div>
+    
   );
 }

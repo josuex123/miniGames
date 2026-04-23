@@ -203,9 +203,9 @@ export default function GameDyno() {
   }, [jump, isGameOver, resetToStart]);
 
   return (
-    <main className="min-h-screen bg-[#F1F5F9] flex flex-col font-sans text-slate-900 relative antialiased overflow-hidden">
-      
-      <style>{`
+    <div className="w-screen h-screen bg-black flex items-center justify-center overflow-hidden">
+      <main className="w-full max-w-[100vw] max-h-[100vh] aspect-[3/2] bg-[#F8FAFC] flex flex-col font-sans text-slate-900 relative antialiased overflow-hidden shadow-2xl">
+         <style>{`
         @keyframes wolf-walk {
           0%, 100% { transform: translateY(0); }
           50% { transform: translateY(-0.2vw); }
@@ -321,6 +321,8 @@ export default function GameDyno() {
           </button>
         </section>
       </div>
-    </main>
+      </main>
+    </div>
+
   );
 }
