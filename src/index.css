@@ -1,4 +1,4 @@
 @import "tailwindcss";
 :root {
-  --scale: min(calc(100vw / 1920), calc(100vh / 1280));
+  --scale: min(calc(100vw / 1920), calc(100vh / 1080));
 }

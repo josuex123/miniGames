@@ -201,9 +201,9 @@ export default function GameDyno() {
   }, [jump, isGameOver, resetToStart]);
 
   return (
-    <div className="w-screen h-screen bg-black flex items-center justify-center overflow-hidden">
-      <main className="w-full max-w-[100vw] max-h-[100vh] aspect-[3/2] bg-[#F8FAFC] flex flex-col font-sans text-slate-900 relative antialiased overflow-hidden shadow-2xl">
-         <style>{`
+  <div className="w-screen min-h-screen bg-black flex items-center justify-center">
+    <main className="w-full max-w-[100vw] aspect-video bg-[#F8FAFC] flex flex-col font-sans text-slate-900 relative antialiased shadow-2xl">   
+      <style>{`
         @keyframes wolf-walk {
           0%, 100% { transform: translateY(0); }
           50% { transform: translateY(-0.2vw); }

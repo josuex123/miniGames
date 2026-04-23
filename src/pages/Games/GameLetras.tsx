@@ -197,9 +197,9 @@ export default function GameLetras() {
   };
 
   return (
-    <div className="w-screen h-screen bg-black flex items-center justify-center overflow-hidden">
-      <main className="w-full max-w-[100vw] max-h-[100vh] aspect-[3/2] bg-[#F8FAFC] flex flex-col font-sans text-slate-900 relative antialiased overflow-hidden shadow-2xl">
-         <GameOverModal
+      <div className="w-screen min-h-screen bg-black flex items-center justify-center">
+    <main className="w-full max-w-[100vw] aspect-video bg-[#F8FAFC] flex flex-col font-sans text-slate-900 relative antialiased shadow-2xl">   
+          <GameOverModal
         isOpen={showGameOver}
         title="¡GAME OVER!"
         message={`Puntaje obtenido: ${score} ✨`}
