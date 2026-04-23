@@ -4,6 +4,7 @@ import hangGame from '../assets/games/HangManGame.png';
 import dynoGame from '../assets/games/DynoGame.png';
 import tetrisGame from '../assets/games/TetrisGame.png';
 import carsGame from '../assets/games/CarsGame.png';
+import tecGame from '../assets/games/TeclasGame.jpg';
 import logoAlpha2 from '../assets/LogoAlphaGaming2.svg';
 import logoCronex2 from '../assets/LogoCronex2.svg';
 
@@ -11,12 +12,12 @@ interface CardItem { id: number; title: string; path: string; imageUrl: string; 
 
 export default function Home() {
   const cards: CardItem[] = [
-    { id: 1, title: 'Palabra rapida', path: '/game_set_word', imageUrl: setGame },
+    { id: 1, title: 'Palabra Rapida', path: '/game_set_word', imageUrl: setGame },
     { id: 2, title: 'Ahorcado', path: '/game_hang_man', imageUrl: hangGame },
     { id: 3, title: 'Carreras', path: '/game_cars', imageUrl: carsGame },
     { id: 4, title: 'Dinosaurio', path: '/game_dyno', imageUrl: dynoGame },
     { id: 5, title: 'Tetris', path: '/game_tetris', imageUrl: tetrisGame },
-    { id: 6, title: 'Juego de letras', path: '/game_letras', imageUrl: setGame },
+    { id: 6, title: 'Lluvia de Teclas', path: '/game_letras', imageUrl: tecGame },
   ];
 
  return (

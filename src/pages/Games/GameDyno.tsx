@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom'; // Añadido useNavigate
 import logoAlpha2 from '../../assets/LogoAlphaGaming2.svg';
 import logoCronex2 from '../../assets/LogoCronex2.svg';
 import wolfImage from '../../assets/WolfGame.png';
@@ -12,13 +12,10 @@ const MAX_SPEED = 4.0;
 const BASE_SPEED = 0.5;
 const SPEED_INCREMENT = 0.008;
 
-// Ajustes de Hitbox para el Lobo
 const DINO_LEFT_PCT = 10.7;
 const DINO_WIDTH_PCT = 6.0; 
-
 const CACTUS_WIDTH_PCT = 3.8;
 const CACTUS_HEIGHT_PX = 50;
-
 const MIN_OBSTACLE_DISTANCE = 35; 
 const MAX_OBSTACLES = 3;
 
@@ -31,6 +28,7 @@ interface Obstacle {
 }
 
 export default function GameDyno() {
+  const navigate = useNavigate(); // Para el botón del menú
   const [score, setScore] = useState(0);
   const [highScore, setHighScore] = useState(() => {
     const saved = localStorage.getItem('dyno-highscore');
@@ -39,7 +37,6 @@ export default function GameDyno() {
   const [isGameOver, setIsGameOver] = useState(false);
   const [isGameStarted, setIsGameStarted] = useState(false);
 
-  // Refs mecánicos
   const dinoY = useRef(GROUND_Y);
   const velocityY = useRef(0);
   const obstacles = useRef<Obstacle[]>([]);
@@ -48,40 +45,57 @@ export default function GameDyno() {
   const frameId = useRef<number>(0);
   const lastObstacleSpawn = useRef(100);
 
-  // Estado visual
   const [visualDinoY, setVisualDinoY] = useState(0);
   const [visualObstacles, setVisualObstacles] = useState<Obstacle[]>([]);
   const [isJumping, setIsJumping] = useState(false);
   const [currentSpeed, setCurrentSpeed] = useState(BASE_SPEED);
 
-  const jump = useCallback(() => {
-    if (!gameActive.current || !isGameStarted) return;
-    if (dinoY.current >= GROUND_Y - 1) {
-      velocityY.current = JUMP_FORCE;
-      setIsJumping(true);
-    }
-  }, [isGameStarted]);
+  // --- NUEVA LÓGICA DE INICIO Y RESET ---
 
   const startGame = useCallback(() => {
     setIsGameStarted(true);
     gameActive.current = true;
+    // Solo reiniciamos la física si el juego no estaba activo
+    if (!isGameOver) {
+       dinoY.current = GROUND_Y;
+       velocityY.current = 0;
+    }
+  }, [isGameOver]);
+
+  const jump = useCallback(() => {
+    // Si el juego no ha empezado (está parado), el primer salto lo inicia
+    if (!isGameStarted) {
+      startGame();
+    }
+    
+    if (!gameActive.current) return;
+
+    if (dinoY.current >= GROUND_Y - 1) {
+      velocityY.current = JUMP_FORCE;
+      setIsJumping(true);
+    }
+  }, [isGameStarted, startGame]);
+
+  // Esta función limpia todo pero NO arranca el juego (isGameStarted queda en false)
+  const resetToStart = useCallback(() => {
+    cancelAnimationFrame(frameId.current);
+    gameActive.current = false;
+    setIsGameStarted(false); // IMPORTANTE: El lobo se queda quieto
+    setIsGameOver(false);
+    
+    // Resetear valores
     dinoY.current = GROUND_Y;
     velocityY.current = 0;
     obstacles.current = [];
     scoreRef.current = 0;
     lastObstacleSpawn.current = 100;
+    
     setScore(0);
-    setIsGameOver(false);
     setVisualDinoY(0);
     setVisualObstacles([]);
     setIsJumping(false);
     setCurrentSpeed(BASE_SPEED);
   }, []);
-
-  const resetGame = useCallback(() => {
-    cancelAnimationFrame(frameId.current);
-    startGame();
-  }, [startGame]);
 
   const spawnObstacle = useCallback(() => {
     const types: Array<'cactus' | 'double-cactus'> = ['cactus', 'cactus', 'double-cactus'];
@@ -180,14 +194,13 @@ export default function GameDyno() {
     const onKey = (e: KeyboardEvent) => {
       if (e.code === 'Space' || e.code === 'ArrowUp') {
         e.preventDefault();
-        if (!isGameStarted) startGame();
-        else if (isGameOver) resetGame();
+        if (isGameOver) resetToStart();
         else jump();
       }
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [jump, isGameOver, resetGame, isGameStarted, startGame]);
+  }, [jump, isGameOver, resetToStart]);
 
   return (
     <main className="min-h-screen bg-[#F1F5F9] flex flex-col font-sans text-slate-900 relative antialiased overflow-hidden">
@@ -210,13 +223,13 @@ export default function GameDyno() {
         isOpen={isGameOver}
         title="FIN DEL JUEGO"
         message={`Puntuación: ${score}`}
-        onRetry={resetGame}
+        onRetry={resetToStart} // Ahora vuelve al estado inicial de espera
+        onMenu={() => navigate('/')}
         variant="lose"
       />
 
       <div className="flex-1 w-full px-[5vw] py-[2.5vw] flex flex-col gap-[2.5vw]">
         
-        {/* HEADER ESCALABLE */}
         <header className="grid grid-cols-[1.2fr_2fr_1.2fr] gap-[2vw] items-center w-full border-b-[0.2vw] border-slate-200 pb-[1.5vw]">
           <div className="flex flex-col items-start gap-[0.5vw]">
             <img src={logoCronex2} alt="Cronex" className="h-auto w-[22vw] object-contain" />
@@ -240,30 +253,27 @@ export default function GameDyno() {
           </div>
         </header>
 
-        {/* ÁREA DE JUEGO */}
         <section className="flex-1 flex flex-col items-center justify-center gap-[3vw]">
           <div className="w-full max-w-[70vw] h-[18vw] bg-white rounded-[3vw] shadow-inner border-[0.2vw] border-slate-200 relative overflow-hidden select-none">
             
-            {/* Nubes escalables */}
-            <div className="absolute top-[3vw] w-[3vw] h-[1vw] bg-slate-100 rounded-full" style={{ right: `${10 + (score % 20)}%` }} />
-            <div className="absolute top-[6vw] w-[4vw] h-[1.2vw] bg-slate-100 rounded-full" style={{ left: `${15 + (score % 15)}%` }} />
-            <div className="absolute top-[2vw] w-[2.5vw] h-[0.8vw] bg-slate-100 rounded-full" style={{ left: `${50 + (score % 25)}%` }} />
+            <div className="absolute top-[3vw] w-[3vw] h-[1vw] bg-slate-100 rounded-full" style={{ right: `20%` }} />
+            <div className="absolute top-[6vw] w-[4vw] h-[1.2vw] bg-slate-100 rounded-full" style={{ left: `15%` }} />
 
-            {/* Suelo */}
             <div className="absolute bottom-[2vw] w-full h-[0.1vw] bg-slate-200" />
 
-            {!isGameStarted && (
-              <div className="absolute inset-0 flex flex-col items-center justify-center bg-white/90 z-30">
-                <h2 className="text-[2.5vw] font-black text-slate-900 mb-[1vw] italic tracking-tighter">WOLF RUN</h2>
-                <button onClick={startGame} className="bg-[#871F80] text-white px-[3vw] py-[1.2vw] rounded-[1vw] font-black text-[1.5vw] shadow-lg transition-all">
+            {/* Overlay de inicio modificado */}
+            {!isGameStarted && !isGameOver && (
+              <div className="absolute inset-0 flex flex-col items-center justify-center bg-white/40 backdrop-blur-[2px] z-30">
+                <h2 className="text-[2.5vw] font-black text-[#871F80] mb-[1vw] italic tracking-tighter drop-shadow-sm">¿LISTO PARA CORRER?</h2>
+                <p className="text-slate-500 font-bold text-[1vw] mb-[1.5vw] uppercase tracking-widest">Presiona saltar para iniciar</p>
+                <button onClick={startGame} className="bg-[#871F80] text-white px-[4vw] py-[1.2vw] rounded-[1vw] font-black text-[1.5vw] shadow-lg hover:scale-105 active:scale-95 transition-all">
                   COMENZAR
                 </button>
               </div>
             )}
 
-            {/* LOBO: Escalado con vw */}
             <div
-              style={{ transform: `translateY(${visualDinoY * 0.1}vw)` }} // Escalamiento de la física a visual vw
+              style={{ transform: `translateY(${visualDinoY * 0.1}vw)` }} 
               className="absolute bottom-[2vw] left-[8vw] w-[6vw] h-[8vw] z-20"
             >
               <img 
@@ -275,7 +285,6 @@ export default function GameDyno() {
               />
             </div>
 
-            {/* Obstáculos escalables */}
             {visualObstacles.map((obs) => (
               <div
                 key={obs.id}
@@ -306,9 +315,9 @@ export default function GameDyno() {
 
           <button
             onMouseDown={jump}
-            className="bg-[#871F80] text-white px-[6vw] py-[2vw] rounded-[1.5vw] font-black text-[2vw] shadow-xl transition-all uppercase italic"
+            className="bg-[#871F80] text-white px-[6vw] py-[2vw] rounded-[1.5vw] font-black text-[2vw] shadow-xl transition-all uppercase italic active:scale-90"
           >
-            SALTAR!
+            {isGameStarted ? "SALTAR!" : "COMENZAR!"}
           </button>
         </section>
       </div>

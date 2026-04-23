@@ -4,7 +4,6 @@ import logoAlpha2 from '../../assets/LogoAlphaGaming2.svg';
 import logoCronex2 from '../../assets/LogoCronex2.svg';
 import GameOverModal from '../../components/GameOverModal';
 
-// Constantes del juego
 const GRID_WIDTH = 10;
 const GRID_HEIGHT = 20;
 
@@ -39,7 +38,6 @@ export default function GameTetris() {
   const [nextPiece, setNextPiece] = useState<Piece>({ type: 'O', rotation: 0, x: 0, y: 0 });
   const gameLoopRef = useRef<number | null>(null);
 
-  // --- LÓGICA ORIGINAL PRESERVADA ---
 
   const getRotatedShape = useCallback((type: keyof typeof TETRIS_PIECES, rotation: number) => {
     let shape = TETRIS_PIECES[type].shape;
@@ -207,7 +205,6 @@ export default function GameTetris() {
         variant="lose"
       />
 
-      {/* HEADER ESCALABLE (Proporción 1920x1080) */}
       <div className="w-full px-[5vw] py-[3vw] flex flex-col gap-[2vw]">
         <header className="grid grid-cols-[1.2fr_2fr_1.2fr] gap-[2vw] items-center w-full border-b-[0.2vw] border-slate-200 pb-[2vw]">
           <div className="flex flex-col items-start gap-[0.5vw]">

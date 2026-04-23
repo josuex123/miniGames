@@ -173,15 +173,17 @@ export default function GameLetras() {
         <header className="grid grid-cols-[1.2fr_2fr_1.2fr] gap-[2vw] items-center w-full border-b-[0.2vw] border-slate-200 pb-[2vw]">
           <div className="flex flex-col items-start gap-[1vw]">
             <img src={logoCronex2} alt="Cronex" className="h-auto w-[18vw] object-contain" />
-          </div>
-          <div className="flex flex-col items-center gap-[1vw]">
             <div className="flex gap-[2vw]">
               <div className="text-[3vw] font-black text-[#871F80] leading-none">{score} <span className="text-[1vw] text-slate-400 uppercase">Pts</span></div>
               <div className="text-[3vw] font-black text-red-500 leading-none">{lives} <span className="text-[1vw] text-slate-400 uppercase">Vidas</span></div>
             </div>
           </div>
-          <div className="flex flex-col items-end gap-[1vw]">
+          <div className="flex flex-col items-center gap-[1vw]">
             <img src={logoAlpha2} alt="Alpha Gaming" className="w-[25vw] h-auto object-contain" />
+            
+          </div>
+          <div className="flex flex-col items-end gap-[1vw]">
+            
             <Link to="/" className="text-slate-400 font-bold hover:text-[#871F80] transition-colors uppercase tracking-widest text-[0.8vw]">← VOLVER AL MENÚ</Link>
           </div>
         </header>
