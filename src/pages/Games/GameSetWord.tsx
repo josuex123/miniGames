@@ -29,7 +29,6 @@ export default function GameSetWord() {
   const [newLimit, setNewLimit] = useState(10);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  // --- LÓGICA ORIGINAL PRESERVADA ---
   useEffect(() => {
     let interval: ReturnType<typeof setInterval> | null = null;
     const currentLimit = selectedWord?.limit || 10;
@@ -103,7 +102,6 @@ export default function GameSetWord() {
         variant={gameState === 'round-win' ? "win" : "lose"}
       />
 
-      {/* Barra de Progreso Superior */}
       <div className="fixed top-0 left-0 h-[0.4vw] bg-slate-200 w-full z-50">
         <div
           className="h-full transition-all duration-1000 bg-[#871F80]"
@@ -113,9 +111,8 @@ export default function GameSetWord() {
 
       <div className="flex-1 w-full px-[5vw] py-[3vw] flex flex-col gap-[3vw]">
         
-        {/* HEADER ESCALABLE */}
+      
         <header className="grid grid-cols-[1.2fr_2fr_1.2fr] gap-[2vw] items-center w-full pb-[2vw] border-b-[0.2vw] border-slate-200">
-          {/* 1. Logo Cronex + Tiempo */}
           <div className="flex flex-col items-start gap-[0.5vw]">
             <img src={logoCronex2} alt="Cronex" className="h-auto w-[22vw] object-contain" />
             <div className="text-[5vw] font-black tabular-nums tracking-tighter text-[#871F80] leading-none">
@@ -123,12 +120,10 @@ export default function GameSetWord() {
             </div>
           </div>
 
-          {/* 2. Logo Alpha Central */}
           <div className="flex justify-center items-center">
             <img src={logoAlpha2} alt="Alpha Gaming" className="w-[32vw] h-auto object-contain" />
           </div>
 
-          {/* 3. Columna de Control */}
           <div className="flex flex-col items-end gap-[1vw]">
             <Link
               to="/"
@@ -153,9 +148,7 @@ export default function GameSetWord() {
 
         <div className="flex-1 grid grid-cols-12 gap-[2.5vw]">
 
-          {/* ASIDE IZQUIERDO: RONDAS Y CREACIÓN */}
           <aside className="col-span-4 space-y-[1.5vw]">
-            {/* 1. Lista de Rondas */}
             <div className="bg-white/80 backdrop-blur-sm rounded-[2.5vw] p-[2vw] border border-white shadow-xl">
               <h3 className="text-[0.6vw] font-black text-slate-400 mb-[1.5vw] uppercase tracking-[0.3em]">Rondas Disponibles</h3>
               <div className="grid grid-cols-1 gap-[0.8vw] max-h-[25vw] overflow-y-auto pr-[0.5vw] custom-scrollbar">
@@ -175,7 +168,6 @@ export default function GameSetWord() {
               </div>
             </div>
 
-            {/* 2. Formulario Agregar */}
             <div className="bg-[#871F80] rounded-[2.5vw] p-[2vw] text-white shadow-2xl relative overflow-hidden group">
               <div className="absolute top-0 right-0 w-[8vw] h-[8vw] bg-white/5 rounded-full -mr-[4vw] -mt-[4vw] transition-transform group-hover:scale-110" />
               <h3 className="text-[0.6vw] font-black text-white/60 mb-[1.2vw] uppercase tracking-[0.3em] relative z-10">Nueva Ronda</h3>
@@ -207,7 +199,6 @@ export default function GameSetWord() {
             </div>
           </aside>
 
-          {/* SECCIÓN DERECHA: CAMPO DE JUEGO */}
           <section className="col-span-8">
             <div className="bg-white p-[2vw] rounded-[4vw] shadow-2xl border border-slate-100 h-full flex flex-col justify-center min-h-[25vw] transition-all">
               <div className="px-[2vw] mb-[1vw]">

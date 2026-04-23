@@ -4,7 +4,6 @@ import logoAlpha2 from '../../assets/LogoAlphaGaming2.svg';
 import logoCronex2 from '../../assets/LogoCronex2.svg';
 import GameOverModal from '../../components/GameOverModal';
 
-// --- CONFIGURACIÓN ---
 const ROAD_WIDTH = 350;
 const CAR_WIDTH = 60;
 const CAR_HEIGHT = 100;
@@ -182,7 +181,6 @@ export default function GameCars() {
               <div className="absolute top-[0.8vw] left-[0.4vw] w-[0.4vw] h-[2vw] bg-white/60 rounded-full blur-[0.1vw]" />
             </div>
 
-            {/* ENEMIGOS: TECLADOS MECÁNICOS */}
             {enemies.map((enemy) => (
               <div
                 key={enemy.id}
@@ -199,7 +197,6 @@ export default function GameCars() {
             ))}
           </div>
 
-          {/* PANEL LATERAL ESCALABLE */}
           <aside className="w-[12vw] flex flex-col gap-[1.5vw]">
             <div className="bg-[#871F80] rounded-[2vw] p-[1.5vw] text-white shadow-lg text-center">
               <h3 className="text-[0.6vw] font-black text-white/60 uppercase tracking-[0.2em] mb-[0.5vw]">SCORE</h3>

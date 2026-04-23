@@ -231,11 +231,9 @@ export default function GameTetris() {
           <div>Líneas: <span className="text-[#871F80]">{lines}</span></div>
         </div>
 
-        {/* ÁREA DE JUEGO CENTRAL ESCALABLE */}
         <div className="flex justify-center items-start gap-[3vw]">
           <div className="bg-white p-[1.5vw] rounded-[3vw] shadow-2xl border border-slate-100 flex gap-[2.5vw]">
             
-            {/* GRID DEL TETRIS: El alma del escalado */}
             <div className="relative w-[18vw] h-[36vw] bg-slate-900 rounded-[1.5vw] border-[0.6vw] border-slate-800 overflow-hidden shadow-inner">
               <div 
                 className="grid h-full w-full p-[0.4vw]" 
@@ -260,7 +258,6 @@ export default function GameTetris() {
 
 
 
-              {/* OVERLAY INICIO */}
               {!isGameStarted && !isGameOver && (
                 <div className="absolute inset-0 bg-black/80 flex flex-col items-center justify-center gap-[2vw] z-50">
                   <div className="text-white text-[3vw] font-black uppercase tracking-widest">TETRIS</div>
@@ -271,7 +268,6 @@ export default function GameTetris() {
               )}
             </div>
 
-            {/* PANEL LATERAL INFO */}
             <aside className="w-[12vw] flex flex-col gap-[1.5vw]">
               <div className="bg-[#871F80] rounded-[2vw] p-[1.5vw] text-white shadow-lg">
                 <h3 className="text-[0.6vw] font-black text-white/60 uppercase tracking-[0.2em] mb-[1vw] text-center">Siguiente</h3>

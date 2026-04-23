@@ -4,7 +4,6 @@ import logoAlpha2 from '../../assets/LogoAlphaGaming2.svg';
 import logoCronex2 from '../../assets/LogoCronex2.svg';
 import GameOverModal from '../../components/GameOverModal';
 
-// --- INTERFACES ---
 interface FallingItem {
   id: number;
   char: string;
@@ -50,7 +49,6 @@ export default function GameLetras() {
     };
   }, [selectedSpeed]);
 
-  // --- CICLO PRINCIPAL ---
   useEffect(() => {
     if (!gameActive || isPaused) {
       if (gameLoopRef.current) cancelAnimationFrame(gameLoopRef.current);
@@ -93,7 +91,6 @@ export default function GameLetras() {
     return () => { if (gameLoopRef.current) cancelAnimationFrame(gameLoopRef.current); };
   }, [gameActive, isPaused, createNewItem]);
 
-  // --- TECLADO ---
   useEffect(() => {
     const messages = ["¡MUY BIEN!", "¡OK!", "¡GENIAL!", "¡EXCELENTE!", "¡BUENA!"];
     const handleKeyDown = (e: KeyboardEvent) => {

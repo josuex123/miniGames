@@ -1,16 +1,16 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { Link, useNavigate } from 'react-router-dom'; // Añadido useNavigate
+import { Link, useNavigate } from 'react-router-dom'; 
 import logoAlpha2 from '../../assets/LogoAlphaGaming2.svg';
 import logoCronex2 from '../../assets/LogoCronex2.svg';
 import wolfImage from '../../assets/WolfGame.png';
 import GameOverModal from '../../components/GameOverModal';
 
-const GRAVITY = 0.45;
-const JUMP_FORCE = -11;
+const GRAVITY = 0.5;
+const JUMP_FORCE = -10;
 const GROUND_Y = 0;
-const MAX_SPEED = 4.0;
+const MAX_SPEED = 3.5;
 const BASE_SPEED = 0.5;
-const SPEED_INCREMENT = 0.008;
+const SPEED_INCREMENT = 0.003;
 
 const DINO_LEFT_PCT = 10.7;
 const DINO_WIDTH_PCT = 6.0; 
@@ -28,7 +28,7 @@ interface Obstacle {
 }
 
 export default function GameDyno() {
-  const navigate = useNavigate(); // Para el botón del menú
+  const navigate = useNavigate(); 
   const [score, setScore] = useState(0);
   const [highScore, setHighScore] = useState(() => {
     const saved = localStorage.getItem('dyno-highscore');
@@ -50,12 +50,10 @@ export default function GameDyno() {
   const [isJumping, setIsJumping] = useState(false);
   const [currentSpeed, setCurrentSpeed] = useState(BASE_SPEED);
 
-  // --- NUEVA LÓGICA DE INICIO Y RESET ---
 
   const startGame = useCallback(() => {
     setIsGameStarted(true);
     gameActive.current = true;
-    // Solo reiniciamos la física si el juego no estaba activo
     if (!isGameOver) {
        dinoY.current = GROUND_Y;
        velocityY.current = 0;
@@ -63,7 +61,6 @@ export default function GameDyno() {
   }, [isGameOver]);
 
   const jump = useCallback(() => {
-    // Si el juego no ha empezado (está parado), el primer salto lo inicia
     if (!isGameStarted) {
       startGame();
     }
@@ -76,14 +73,12 @@ export default function GameDyno() {
     }
   }, [isGameStarted, startGame]);
 
-  // Esta función limpia todo pero NO arranca el juego (isGameStarted queda en false)
   const resetToStart = useCallback(() => {
     cancelAnimationFrame(frameId.current);
     gameActive.current = false;
-    setIsGameStarted(false); // IMPORTANTE: El lobo se queda quieto
+    setIsGameStarted(false); 
     setIsGameOver(false);
     
-    // Resetear valores
     dinoY.current = GROUND_Y;
     velocityY.current = 0;
     obstacles.current = [];
@@ -152,11 +147,13 @@ export default function GameDyno() {
         localStorage.setItem('dyno-highscore', scoreRef.current.toString());
       }
 
+      const dynamicMinDistance = MIN_OBSTACLE_DISTANCE + (currentSpeed * 5);
+
       const canSpawn =
         obstacles.current.length < MAX_OBSTACLES &&
-        lastObstacleSpawn.current < (100 - MIN_OBSTACLE_DISTANCE);
+        lastObstacleSpawn.current < (100 - dynamicMinDistance);
 
-      if (canSpawn && Math.random() > 0.97) {
+      if (canSpawn && Math.random() > 0.96) { 
         spawnObstacle();
       }
 
@@ -169,9 +166,10 @@ export default function GameDyno() {
         const obsRight = obs.x + obs.width;
         const obsTop = obs.height;
 
-        const marginX = 1.2; 
-        const overlapX = dinoRight - marginX > obsLeft && dinoLeft + marginX < obsRight;
-        const overlapY = dinoBottom < obsTop - 5; 
+        const marginX = 2.5; 
+        const marginY = 15;
+        const overlapX = (dinoRight - marginX) > obsLeft && (dinoLeft + marginX) < obsRight;
+        const overlapY = dinoBottom < (obsTop - marginY);
 
         if (overlapX && overlapY) {
           gameActive.current = false;
@@ -223,7 +221,7 @@ export default function GameDyno() {
         isOpen={isGameOver}
         title="FIN DEL JUEGO"
         message={`Puntuación: ${score}`}
-        onRetry={resetToStart} // Ahora vuelve al estado inicial de espera
+        onRetry={resetToStart} 
         onMenu={() => navigate('/')}
         variant="lose"
       />
@@ -261,7 +259,6 @@ export default function GameDyno() {
 
             <div className="absolute bottom-[2vw] w-full h-[0.1vw] bg-slate-200" />
 
-            {/* Overlay de inicio modificado */}
             {!isGameStarted && !isGameOver && (
               <div className="absolute inset-0 flex flex-col items-center justify-center bg-white/40 backdrop-blur-[2px] z-30">
                 <h2 className="text-[2.5vw] font-black text-[#871F80] mb-[1vw] italic tracking-tighter drop-shadow-sm">¿LISTO PARA CORRER?</h2>
@@ -279,7 +276,7 @@ export default function GameDyno() {
               <img 
                 src={wolfImage} 
                 alt="Lobo" 
-                className={`w-full h-full object-contain ${
+                className={`w-full h-full object-contain mix-blend-multiply ${
                   isJumping ? 'wolf-jump' : (isGameStarted ? 'wolf-walk' : '')
                 }`}
               />

@@ -4,14 +4,12 @@ import GameOverModal from '../../components/GameOverModal';
 import logoAlpha2 from '../../assets/LogoAlphaGaming2.svg';
 import logoCronex2 from '../../assets/LogoCronex2.svg';
 
-// --- INTERFACES ---
 interface WordConfig {
   word: string;
 }
 
 const MAX_ATTEMPTS = 6;
 
-// --- COMPONENTE VISUAL DEL AHORCADO ---
 const HangmanFigure: React.FC<{ wrongCount: number }> = ({ wrongCount }) => {
   const partStyle = "absolute bg-slate-800 transition-all duration-500 shadow-sm";
   return (
@@ -94,7 +92,6 @@ export default function GameHangMan() {
 
       <div className="flex-1 w-full px-[5vw] py-[3vw] flex flex-col gap-[3vw]">
         
-        {/* HEADER */}
         <header className="grid grid-cols-[1.2fr_2fr_1.2fr] gap-[2vw] items-center w-full">
           <div className="flex flex-col items-start gap-[0.5vw]">
             <img src={logoCronex2} alt="Cronex" className="h-auto w-[22vw] object-contain" />
@@ -116,7 +113,6 @@ export default function GameHangMan() {
 
         <div className="flex-1 grid grid-cols-12 gap-[2.5vw]">
           
-          {/* ASIDE: INFO PALABRA */}
           <aside className="col-span-4 space-y-[1.5vw]">
             <div className="bg-white/80 backdrop-blur-sm rounded-[2.5vw] p-[2vw] border border-white shadow-xl min-h-[12vw]">
               <h3 className="text-[0.7vw] font-black text-slate-400 mb-[1.5vw] uppercase tracking-[0.3em]">Reto Actual</h3>
@@ -135,7 +131,6 @@ export default function GameHangMan() {
               )}
             </div>
 
-            {/* FORMULARIO */}
             <div className="bg-[#871F80] rounded-[2.5vw] p-[2vw] text-white shadow-2xl relative overflow-hidden group">
               <h3 className="text-[0.7vw] font-black text-white/60 mb-[1.5vw] uppercase tracking-[0.3em]">Nueva Partida</h3>
               <div className="space-y-[1vw] relative z-10">
@@ -157,7 +152,6 @@ export default function GameHangMan() {
             </div>
           </aside>
 
-          {/* ÁREA DE JUEGO PRINCIPAL */}
           <section className="col-span-8">
             <div className="bg-white p-[2.5vw] rounded-[3.5vw] shadow-2xl border border-slate-100 min-h-[35vw] flex flex-col items-center justify-between">
               
@@ -183,7 +177,6 @@ export default function GameHangMan() {
                 )}
               </div>
 
-              {/* TECLADO */}
               <div className="grid grid-cols-10 gap-[0.5vw] w-full max-w-[40vw]">
                 {KEYS.map(key => {
                   const isUsed = guessedLetters.has(key);
