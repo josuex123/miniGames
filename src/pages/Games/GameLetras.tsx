@@ -14,14 +14,16 @@ interface FallingItem {
 }
 
 const SPEEDS = {
-  LENTO: 0.35,
-  NORMAL: 0.5,
-  RÁPIDO: 0.6
+  LENTO: 0.5,
+  NORMAL: 0.6,
+  RÁPIDO: 0.8
 };
 
 const SPAWN_RATE = 1500;
 const HIT_ZONE_MIN = 75;
 const HIT_ZONE_MAX = 95;
+
+const MESSAGES = ["¡MUY BIEN!", "¡OK!", "¡GENIAL!", "¡EXCELENTE!", "¡BUENA!"];
 
 export default function GameLetras() {
   const [items, setItems] = useState<FallingItem[]>([]);
@@ -36,6 +38,7 @@ export default function GameLetras() {
 
   const gameLoopRef = useRef<number | undefined>(undefined);
   const lastSpawnRef = useRef<number>(0);
+  const feedbackTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const createNewItem = useCallback((): FallingItem => {
     const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
@@ -50,82 +53,120 @@ export default function GameLetras() {
   }, [selectedSpeed]);
 
   useEffect(() => {
-    if (!gameActive || isPaused) {
-      if (gameLoopRef.current) cancelAnimationFrame(gameLoopRef.current);
-      return;
-    }
+    return () => {
+      if (feedbackTimeoutRef.current) {
+        clearTimeout(feedbackTimeoutRef.current);
+      }
+    };
+  }, []);
 
-    const update = (time: number) => {
-      if (lastSpawnRef.current === 0) lastSpawnRef.current = time;
+    useEffect(() => {
+      if (!gameActive || isPaused) {
+        lastSpawnRef.current = 0;
+        if (gameLoopRef.current) cancelAnimationFrame(gameLoopRef.current);
+        return;
+      }
 
-      setItems(prev => {
-        let newItems = [...prev];
-        let livesLost = 0;
+      const update = (time: number) => {
+        if (lastSpawnRef.current === 0) lastSpawnRef.current = time;
 
-        newItems = newItems.map(item => {
-          if (item.isHit) return item;
-          const nextY = item.y + item.speed;
-          if (nextY > 105) {
-            livesLost++;
-            return null;
+        setItems(prev => {
+          let missedCount = 0;
+          
+          const filtered = prev.map(item => {
+            if (item.isHit) return item;
+            const nextY = item.y + item.speed;
+
+            if (nextY > 105) {
+              missedCount++; 
+              return null;
+            }
+            return { ...item, y: nextY };
+          }).filter((item): item is FallingItem => item !== null);
+
+          if (missedCount > 0) {
+            setLives(l => {
+              const newLives = l - missedCount;
+              return newLives < 0 ? 0 : newLives;
+            });
           }
-          return { ...item, y: nextY };
-        }).filter((item): item is FallingItem => item !== null);
 
-        if (time - lastSpawnRef.current > SPAWN_RATE) {
-          newItems.push(createNewItem());
-          lastSpawnRef.current = time;
-        }
+          if (time - lastSpawnRef.current > SPAWN_RATE) {
+            filtered.push(createNewItem());
+            lastSpawnRef.current = time;
+          }
 
-        if (livesLost > 0) {
-          setLives(l => Math.max(0, l - livesLost));
-        }
+          return filtered;
+        });
 
-        return newItems;
-      });
+        gameLoopRef.current = requestAnimationFrame(update);
+      };
 
       gameLoopRef.current = requestAnimationFrame(update);
-    };
 
-    gameLoopRef.current = requestAnimationFrame(update);
-    return () => { if (gameLoopRef.current) cancelAnimationFrame(gameLoopRef.current); };
-  }, [gameActive, isPaused, createNewItem]);
+      return () => {
+        if (gameLoopRef.current) cancelAnimationFrame(gameLoopRef.current);
+      };
+    }, [gameActive, isPaused, createNewItem]);
 
-  useEffect(() => {
-    const messages = ["¡MUY BIEN!", "¡OK!", "¡GENIAL!", "¡EXCELENTE!", "¡BUENA!"];
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (!gameActive || isPaused) return;
-      const key = e.key.toUpperCase();
 
-      setItems(prev => {
-        const targetIndex = prev.findIndex(item =>
-          item.char === key && item.y >= HIT_ZONE_MIN && item.y <= HIT_ZONE_MAX && !item.isHit
-        );
+  const handleKeyDown = useCallback((e: KeyboardEvent) => {
+    if (!gameActive || isPaused) return;
 
-        if (targetIndex !== -1) {
-          setFeedback(messages[Math.floor(Math.random() * messages.length)]);
-          setTimeout(() => setFeedback(""), 800);
-          setScore(s => s + 10);
+    const key = e.key.toUpperCase();
 
-          const newItems = [...prev];
-          const hitItem = { ...newItems[targetIndex], isHit: true };
-          newItems[targetIndex] = hitItem;
+    setItems(prev => {
+      const targetIndex = prev.findIndex(item =>
+        item.char === key &&
+        item.y >= (HIT_ZONE_MIN - 5) &&
+        item.y <= (HIT_ZONE_MAX + 5) &&
+        !item.isHit
+      );
 
-          setTimeout(() => {
-            setItems(current => current.filter(i => i.id !== hitItem.id));
-          }, 150);
+      if (targetIndex !== -1) {
+        setScore(s => s + 10);
 
-          return newItems;
+        setFeedback(MESSAGES[Math.floor(Math.random() * MESSAGES.length)]);
+
+        if (feedbackTimeoutRef.current) {
+          clearTimeout(feedbackTimeoutRef.current);
         }
-        return prev;
-      });
-    };
 
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
+        feedbackTimeoutRef.current = setTimeout(() => {
+          setFeedback("");
+        }, 800);
+
+        const newItems = [...prev];
+        const hitItem = { ...newItems[targetIndex], isHit: true };
+        newItems[targetIndex] = hitItem;
+
+        setTimeout(() => {
+          setItems(current => current.filter(i => i.id !== hitItem.id));
+        }, 150);
+
+        return newItems;
+      }
+
+      return prev;
+    });
   }, [gameActive, isPaused]);
 
-  // --- CONTROL DE ESTADO DE PERDIDA ---
+  useEffect(() => {
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [handleKeyDown]);
+
+  // LIMPIEZA DE ITEMS HIT
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setItems(prev =>
+        prev.filter(item => !item.isHit || (item.isHit && item.y < 100))
+      );
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, []);
+
   useEffect(() => {
     if (lives <= 0 && gameActive) {
       setGameActive(false);
@@ -281,6 +322,5 @@ export default function GameLetras() {
       </div>
       </main>
     </div>
-   
   );
 }
