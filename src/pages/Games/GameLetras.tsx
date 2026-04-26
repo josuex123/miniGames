@@ -41,7 +41,7 @@ export default function GameLetras() {
   const feedbackTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const createNewItem = useCallback((): FallingItem => {
-    const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+    const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
     return {
       id: Math.random() + Date.now(),
       char: chars.charAt(Math.floor(Math.random() * chars.length)),
