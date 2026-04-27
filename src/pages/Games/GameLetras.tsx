@@ -228,13 +228,15 @@ export default function GameLetras() {
 
         <div className="flex-1 grid grid-cols-12 gap-[3vw]">
           <aside className="col-span-3 space-y-[2vw]">
-            <div className="bg-white/80 backdrop-blur-sm rounded-[2vw] p-[2vw] border border-white shadow-xl">
+            <div className="bg-slate-50 rounded-[2vw] p-[2vw] border border-slate-200 shadow-xl">
               <h3 className="text-[0.7vw] font-black text-slate-400 mb-[1vw] uppercase tracking-[0.3em]">Record</h3>
-              <div className="text-[2.5vw] font-black text-slate-800 tracking-tighter leading-none">{highScore.toLocaleString()}</div>
+              <div className="text-[2.5vw] font-black text-slate-900 tracking-tighter leading-none">
+                {highScore.toLocaleString()}
+              </div>
             </div>
 
-            <div className="bg-[#871F80] rounded-[2vw] p-[2vw] text-white shadow-2xl">
-              <h3 className="text-[0.7vw] font-black text-white/60 mb-[1vw] uppercase tracking-[0.3em]">Controles</h3>
+            <div className="bg-white rounded-[2vw] p-[2vw] text-slate-800 border border-slate-200 shadow-2xl">
+              <h3 className="text-[0.7vw] font-black text-[#871F80] mb-[1vw] uppercase tracking-[0.3em]">Controles</h3>
 
               {!gameActive ? (
                 <>
@@ -244,16 +246,20 @@ export default function GameLetras() {
                       <button
                         key={level}
                         onClick={() => setSelectedSpeed(SPEEDS[level])}
-                        className={`w-full py-[0.8vw] rounded-[0.8vw] font-black text-[0.9vw] transition-all border-[0.15vw] ${selectedSpeed === SPEEDS[level]
-                            ? 'bg-white text-[#871F80] border-white scale-105 shadow-lg'
-                            : 'bg-transparent text-white border-white/30 hover:bg-white/10'
-                          }`}
+                        className={`w-full py-[0.8vw] rounded-[0.8vw] font-black text-[0.9vw] transition-all border-[0.15vw] ${
+                          selectedSpeed === SPEEDS[level]
+                            ? 'bg-[#871F80] text-white border-[#871F80] scale-105 shadow-lg'
+                            : 'bg-slate-900 text-white border-slate-900 hover:bg-slate-800'
+                        }`}
                       >
                         {level}
                       </button>
                     ))}
                   </div>
-                  <button onClick={startGame} className="w-full bg-emerald-500 text-white py-[1.2vw] rounded-[0.8vw] font-black text-[1vw] hover:bg-emerald-400 transition-all shadow-lg">
+                  <button 
+                    onClick={startGame} 
+                    className="w-full bg-emerald-500 text-white py-[1.2vw] rounded-[0.8vw] font-black text-[1vw] hover:bg-emerald-400 transition-all shadow-lg"
+                  >
                     ¡EMPEZAR!
                   </button>
                 </>
@@ -261,11 +267,16 @@ export default function GameLetras() {
                 <div className="space-y-[1vw]">
                   <button
                     onClick={() => setIsPaused(!isPaused)}
-                    className={`w-full py-[1.2vw] rounded-[0.8vw] font-black text-[1vw] transition-all shadow-lg ${isPaused ? 'bg-emerald-500' : 'bg-yellow-500'}`}
+                    className={`w-full py-[1.2vw] rounded-[0.8vw] font-black text-[1vw] transition-all shadow-lg text-white ${
+                      isPaused ? 'bg-emerald-500 hover:bg-emerald-400' : 'bg-yellow-500 hover:bg-yellow-400'
+                    }`}
                   >
                     {isPaused ? 'REANUDAR' : 'PAUSAR'}
                   </button>
-                  <button onClick={resetToMenu} className="w-full bg-red-500 text-white py-[1.2vw] rounded-[0.8vw] font-black text-[1vw] hover:bg-red-600 transition-all shadow-lg">
+                  <button 
+                    onClick={resetToMenu} 
+                    className="w-full bg-red-500 text-white py-[1.2vw] rounded-[0.8vw] font-black text-[1vw] hover:bg-red-600 transition-all shadow-lg"
+                  >
                     SALIR
                   </button>
                 </div>
@@ -274,23 +285,23 @@ export default function GameLetras() {
           </aside>
 
           <section className="col-span-9 relative">
-            <div className="bg-slate-900 rounded-[3vw] shadow-2xl border-[0.8vw] border-white h-[35vw] relative overflow-hidden">
+            <div className="bg-slate-50 rounded-[3vw] shadow-2xl border-[0.8vw] border-slate-200 h-[35vw] relative overflow-hidden">
 
               {feedback && (
                 <div className="absolute top-[2vw] left-0 right-0 z-[60] flex justify-center pointer-events-none animate-bounce">
-                  <span className="text-[4vw] font-black text-emerald-400 drop-shadow-[0_0_1.5vw_rgba(52,211,153,0.7)] uppercase">
+                  <span className="text-[4vw] font-black text-emerald-500 drop-shadow-[0_0_1.5vw_rgba(16,185,129,0.4)] uppercase">
                     {feedback}
                   </span>
                 </div>
               )}
 
               {isPaused && (
-                <div className="absolute inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center">
-                  <div className="text-white text-[4vw] font-black tracking-tighter animate-pulse">PAUSA</div>
+                <div className="absolute inset-0 z-50 bg-white/60 backdrop-blur-sm flex items-center justify-center">
+                  <div className="text-slate-900 text-[4vw] font-black tracking-tighter animate-pulse">PAUSA</div>
                 </div>
               )}
 
-              <div className="absolute bottom-[5%] left-0 right-0 h-[20%] bg-gradient-to-t from-[#871F80]/40 to-transparent border-t-[0.3vw] border-dashed border-[#871F80]/50 flex items-center justify-center">
+              <div className="absolute bottom-[5%] left-0 right-0 h-[20%] bg-gradient-to-t from-[#871F80]/10 to-transparent border-t-[0.3vw] border-dashed border-[#871F80]/30 flex items-center justify-center">
                 <span className="text-[#871F80] font-black tracking-[1vw] opacity-30 text-[1.5vw] uppercase">Zona de Acción</span>
               </div>
 
@@ -301,7 +312,7 @@ export default function GameLetras() {
                   className={`absolute w-[4vw] h-[4vw] flex items-center justify-center rounded-[0.8vw] font-black text-[2vw] shadow-xl border-b-[0.4vw] transition-[transform,background-color] duration-150
                     ${item.isHit
                       ? 'bg-emerald-500 border-emerald-700 text-white scale-125 z-10'
-                      : 'bg-white border-slate-300 text-slate-800'
+                      : 'bg-slate-900 border-slate-700 text-white'
                     }`}
                 >
                   {item.char}
@@ -309,10 +320,10 @@ export default function GameLetras() {
               ))}
 
               {!gameActive && items.length === 0 && !showGameOver && (
-                <div className="absolute inset-0 flex flex-col items-center justify-center text-center p-[2vw] bg-slate-900/60 backdrop-blur-sm">
-                  <div className="bg-white p-[3vw] rounded-[2vw] shadow-2xl">
-                    <p className="text-[#871F80] font-black text-[2vw] mb-[0.5vw] uppercase">Configura tu nivel</p>
-                    <p className="text-slate-400 font-bold text-[1vw]">Elige la velocidad para comenzar</p>
+                <div className="absolute inset-0 flex flex-col items-center justify-center text-center p-[2vw] bg-white/60 backdrop-blur-sm">
+                  <div className="bg-slate-900 p-[3vw] rounded-[2vw] shadow-2xl">
+                    <p className="text-emerald-400 font-black text-[2vw] mb-[0.5vw] uppercase">Configura tu nivel</p>
+                    <p className="text-slate-300 font-bold text-[1vw]">Elige la velocidad para comenzar</p>
                   </div>
                 </div>
               )}
