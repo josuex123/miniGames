@@ -228,8 +228,8 @@ export default function GameLetras() {
 
         <div className="flex-1 grid grid-cols-12 gap-[3vw]">
           <aside className="col-span-3 space-y-[2vw]">
-            <div className="bg-slate-50 rounded-[2vw] p-[2vw] border border-slate-200 shadow-xl">
-              <h3 className="text-[0.7vw] font-black text-slate-400 mb-[1vw] uppercase tracking-[0.3em]">Record</h3>
+            <div className="bg-white rounded-[2vw] p-[2vw] border border-slate-200 shadow-xl">
+              <h3 className="text-[0.7vw] font-black text-[#871F80] mb-[1vw] uppercase tracking-[0.3em]">Record</h3>
               <div className="text-[2.5vw] font-black text-slate-900 tracking-tighter leading-none">
                 {highScore.toLocaleString()}
               </div>
@@ -240,7 +240,7 @@ export default function GameLetras() {
 
               {!gameActive ? (
                 <>
-                  <p className="font-bold text-[0.9vw] leading-relaxed mb-[1.5vw]">Velocidad:</p>
+                  <p className="font-bold text-[0.9vw] leading-relaxed mb-[1.5vw] text-slate-500">Velocidad:</p>
                   <div className="space-y-[0.8vw] mb-[1.5vw]">
                     {(Object.keys(SPEEDS) as Array<keyof typeof SPEEDS>).map((level) => (
                       <button
@@ -258,7 +258,7 @@ export default function GameLetras() {
                   </div>
                   <button 
                     onClick={startGame} 
-                    className="w-full bg-emerald-500 text-white py-[1.2vw] rounded-[0.8vw] font-black text-[1vw] hover:bg-emerald-400 transition-all shadow-lg"
+                    className="w-full bg-emerald-600 text-white py-[1.2vw] rounded-[0.8vw] font-black text-[1vw] hover:bg-emerald-400 transition-all shadow-lg uppercase"
                   >
                     ¡EMPEZAR!
                   </button>
@@ -283,7 +283,6 @@ export default function GameLetras() {
               )}
             </div>
           </aside>
-
           <section className="col-span-9 relative">
             <div className="bg-slate-50 rounded-[3vw] shadow-2xl border-[0.8vw] border-slate-200 h-[35vw] relative overflow-hidden">
 
@@ -321,9 +320,13 @@ export default function GameLetras() {
 
               {!gameActive && items.length === 0 && !showGameOver && (
                 <div className="absolute inset-0 flex flex-col items-center justify-center text-center p-[2vw] bg-white/60 backdrop-blur-sm">
-                  <div className="bg-slate-900 p-[3vw] rounded-[2vw] shadow-2xl">
-                    <p className="text-emerald-400 font-black text-[2vw] mb-[0.5vw] uppercase">Configura tu nivel</p>
-                    <p className="text-slate-300 font-bold text-[1vw]">Elige la velocidad para comenzar</p>
+                  <div className="bg-[#871F80] p-[3vw] rounded-[2vw] shadow-2xl border-[0.4vw] border-white/20">
+                    <p className="text-white font-black text-[2vw] mb-[0.5vw] uppercase tracking-tight">
+                      Configura tu nivel
+                    </p>
+                    <p className="text-white/90 font-bold text-[1vw]">
+                      Elige la velocidad para comenzar
+                    </p>
                   </div>
                 </div>
               )}

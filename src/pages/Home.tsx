@@ -21,22 +21,18 @@ export default function Home() {
   ];
 
  return (
-    /* Contenedor principal: Usamos h-screen para forzar el aspecto 1080 */
     <div className="min-h-screen w-full bg-[#F8FAFC] flex flex-col items-center justify-center p-[4vw]">
       
-      {/* HEADER: Proporcional al ancho de pantalla */}
       <header className="w-full grid grid-cols-[1fr_2fr_1fr] items-center border-b-[0.2vw] border-slate-200 pb-[3vw] mb-[4vw] shrink-0">
         
-        {/* LOGO IZQUIERDO: Escala con el ancho */}
-        <div className="flex justify-start">
+        <div className="flex flex-col items-start gap-[0.5cqw]">
           <img
             src={logoCronex2}
             alt="Cronex"
-            className="w-[10vw] h-auto object-contain" 
+            className="h-auto w-[22cqw] object-contain" 
           />
         </div>
 
-        {/* LOGO CENTRAL */}
         <div className="flex justify-center">
           <img
             src={logoAlpha2}
@@ -45,7 +41,6 @@ export default function Home() {
           />
         </div>
 
-        {/* TEXTO DERECHO */}
         <div className="text-right flex flex-col justify-center">
           <h1 className="text-[3vw] font-black text-[#871F80] uppercase tracking-[0.1em] leading-none">
             Game Center
@@ -56,7 +51,6 @@ export default function Home() {
         </div>
       </header>
 
-      {/* GRID: 3 columnas que escalan perfectamente */}
       <main className="w-full flex-grow flex items-center">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-[3vw] w-full">
           {cards.map((card) => (
@@ -79,14 +73,12 @@ export default function Home() {
                 </span>
               </div>
 
-              {/* Borde de hover escalable */}
               <div className="absolute inset-0 border-[0.4vw] border-transparent group-hover:border-[#871F80]/20 rounded-[2vw] pointer-events-none" />
             </Link>
           ))}
         </div>
       </main>
 
-      {/* FOOTER */}
       <footer className="mt-[4vw] text-slate-400 text-[1vw] font-bold uppercase tracking-[0.5em] shrink-0">
         Alpha Gaming © 2026
       </footer>
